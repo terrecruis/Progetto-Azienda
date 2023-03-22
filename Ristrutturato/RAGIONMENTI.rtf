@@ -1,8 +1,8 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2639
+{\rtf1\ansi\ansicpg1252\cocoartf2708
 \cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica-Bold;\f1\fswiss\fcharset0 Helvetica;}
 {\colortbl;\red255\green255\blue255;}
 {\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\paperw11900\paperh16840\margl1440\margr1440\vieww23340\viewh10100\viewkind0
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 
 \f0\b\fs36 \cf0 SCELTE RISTRUTTURAZIONE\
@@ -12,9 +12,18 @@
 Scegliamo di rendere dirigente un entita a parte questo perche abbiamo un accesso ai dati pi\'f9 rapido e semplice.\
 Siccome la classe Dirigente ha associazioni che fanno distinzione a quelle dell entit\'e0 padre abbiamo assenza di valori nulli e incremento degli accessi\
 -Assenza valori nulli: se accorpiamo in dipendente ci saranno molti campi a NULL\
--Incremento accessi: altrimenti se vogliamo accedere ai dirigente dobbiamo per forza passare per impiegato\
+-Incremento accessi: altrimenti se vogliamo accedere ai dirigente dobbiamo per forza passare per impiegato.\
 \
-\ul ACCORPAMENTO DI JUNION, MIDDLE, SENIOR\
-\ulnone Conviene quando le operazioni non fanno molta distinzione tra le occorrenze di impiegato e dei suoi figli NON Introduciamo valori nulli perche l\'92attributo Tipo_impiegato \'e8 NOTNULL \
+\ul ACCORPAMENTO DI JUNION, MIDDLE, SENIOR E ACCORPAMENTO DI STORICO\
+\ulnone Conviene quando le operazioni non fanno molta distinzione tra le occorrenze di impiegato e dei suoi figli, aggiungiamo all\'92entit\'e0 Impiegato l\'92attributo : data_assunzione\ul ,\ulnone in questo modo non solo togliamo attributi ridondati come lo status di essere junior middle e senior ma anche lo storico in quanto, se conosco la data assunzione di un impiegato so gi\'e0 gli scatti di carriera quando avvengono\'85\
+Lo storico lo gestisco con una VIEW in cui con calcoli costanti riesco a sapere per ogni impiegato lo STATUS.\
+
+\f0\b\fs36 \
 \
+RAGIONAMENTO SU AFFERENZA E STORICO [\'85] :\
+
+\f1\b0\fs26 1. L\'92idea \'e8 quella di creare una classe \'93Afferenza\'94 all\'92associazione fra la classe Impiegato e Laboratorio con attributi :\
+Data_Inizio_afferenza, data_fine_afferenza, in questo modo, riesco a mappare per ogni impiegato il tempo di afferenza a un dato laboratorio e, in corrispondenza, anche a quale progetto ha lavorato\'85 Questo ci permette di risalire per ogni impiegato alla lista di progetti che ha lavorato[\'85] e, conseguentemente, anche all\'92ammontare di ore totali svolti su un dato progetto, facendo una somma totale sulle afferenze ad un laboratorio qualsiasi con ID_progetto specifico\'85 (tutto cio implementato in una VIEW) \
+2. Lo storico nel concettuale lo lascio, ma, attraverso un analisi piu approfondita si denota che lo Status di un Impiegato come \'91Junior\'92,\'92Middle\'92 e \'92Senior\'92 sono attributi calcolabili a tempo costante tramite un banale calcolo :\
+(data odierna - data inizio assunzione), quindi in fase di ristrutturazione posso distruggere la classe di Storico e, aggiungere ad Impiegato un attributo \'93data assunzione\'94[\'85]\
 }
