@@ -22,9 +22,17 @@ Lo storico lo gestisco con una VIEW in cui con calcoli costanti riesco a sapere 
 \f0\b\fs36 \
 \
 RAGIONAMENTO SU AFFERENZA E STORICO [\'85] :\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 
-\f1\b0\fs26 1. L\'92idea \'e8 quella di creare una classe \'93Afferenza\'94 all\'92associazione fra la classe Impiegato e Laboratorio con attributi :\
+\f1\b0\fs26 \cf0 1. L\'92idea \'e8 quella di creare una classe \'93Afferenza\'94 all\'92associazione fra la classe Impiegato e Laboratorio con attributi :\
 Data_Inizio_afferenza, data_fine_afferenza, in questo modo, riesco a mappare per ogni impiegato il tempo di afferenza a un dato laboratorio e, in corrispondenza, anche a quale progetto ha lavorato\'85 Questo ci permette di risalire per ogni impiegato alla lista di progetti che ha lavorato[\'85] e, conseguentemente, anche all\'92ammontare di ore totali svolti su un dato progetto, facendo una somma totale sulle afferenze ad un laboratorio qualsiasi con ID_progetto specifico\'85 (tutto cio implementato in una VIEW) \
 2. Lo storico nel concettuale lo lascio, ma, attraverso un analisi piu approfondita si denota che lo Status di un Impiegato come \'91Junior\'92,\'92Middle\'92 e \'92Senior\'92 sono attributi calcolabili a tempo costante tramite un banale calcolo :\
-(data odierna - data inizio assunzione), quindi in fase di ristrutturazione posso distruggere la classe di Storico e, aggiungere ad Impiegato un attributo \'93data assunzione\'94[\'85]\
+(data odierna - data inizio assunzione), quindi in fase di ristrutturazione posso distruggere la classe di Storico e, aggiungere ad Impiegato un attributo \'93data assunzione\'94[\'85]
+\f0\b\fs36 \
+\pard\tx566\tx697\tx697\tx809\tx809\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6594\tx6594\tx6594\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f1\b0\fs26 \cf0 \
 }
