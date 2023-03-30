@@ -2605,7 +2605,7 @@
 										"$ref": "AAAAAAGGxpPAXdfirOU="
 									},
 									"edgePosition": 1,
-									"text": "+Svolgimento"
+									"text": "+Gestione"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -2732,7 +2732,7 @@
 									"hostEdge": {
 										"$ref": "AAAAAAGGxpPAXdfirOU="
 									},
-									"text": "+1...1"
+									"text": "+0...1"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -4276,7 +4276,7 @@
 							"_parent": {
 								"$ref": "AAAAAAGGxolUflMdOo8="
 							},
-							"name": "Svolgimento",
+							"name": "Gestione",
 							"end1": {
 								"_type": "UMLAssociationEnd",
 								"_id": "AAAAAAGGxpPAXNffL6c=",
@@ -4294,7 +4294,7 @@
 								"_parent": {
 									"$ref": "AAAAAAGGxpPAXNfeljk="
 								},
-								"name": "1...1",
+								"name": "0...1",
 								"reference": {
 									"$ref": "AAAAAAGGxol8rFNHOao="
 								}

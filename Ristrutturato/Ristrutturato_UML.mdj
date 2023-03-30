@@ -397,7 +397,7 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"left": 656,
-											"top": -384,
+											"top": -400,
 											"height": 13
 										},
 										{
@@ -408,7 +408,7 @@
 											},
 											"font": "Arial;13;1",
 											"left": 989,
-											"top": 199,
+											"top": 191,
 											"width": 121.5068359375,
 											"height": 13,
 											"text": "PROGETTO"
@@ -422,7 +422,7 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"left": 656,
-											"top": -384,
+											"top": -400,
 											"width": 73.67724609375,
 											"height": 13,
 											"text": "(from Model)"
@@ -436,14 +436,14 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"left": 656,
-											"top": -384,
+											"top": -400,
 											"height": 13,
 											"horizontalAlignment": 1
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 984,
-									"top": 192,
+									"top": 184,
 									"width": 131.5068359375,
 									"height": 25,
 									"stereotypeLabel": {
@@ -480,7 +480,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 989,
-											"top": 222,
+											"top": 214,
 											"width": 121.5068359375,
 											"height": 13,
 											"text": "+CUP{PK}: Varchar",
@@ -497,7 +497,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 989,
-											"top": 237,
+											"top": 229,
 											"width": 121.5068359375,
 											"height": 13,
 											"text": "+NomeProg: Varchar",
@@ -514,7 +514,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 989,
-											"top": 252,
+											"top": 244,
 											"width": 121.5068359375,
 											"height": 13,
 											"text": "+Budget: Decimal",
@@ -523,7 +523,7 @@
 									],
 									"font": "Arial;13;0",
 									"left": 984,
-									"top": 217,
+									"top": 209,
 									"width": 131.5068359375,
 									"height": 53
 								},
@@ -538,7 +538,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 984,
-									"top": 270,
+									"top": 262,
 									"width": 131.5068359375,
 									"height": 10
 								},
@@ -554,7 +554,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 328,
-									"top": -192,
+									"top": -200,
 									"width": 10,
 									"height": 10
 								},
@@ -570,7 +570,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 328,
-									"top": -192,
+									"top": -200,
 									"width": 10,
 									"height": 10
 								}
@@ -578,7 +578,7 @@
 							"font": "Arial;13;0",
 							"containerChangeable": true,
 							"left": 984,
-							"top": 192,
+							"top": 184,
 							"width": 131.5068359375,
 							"height": 89,
 							"nameCompartment": {
@@ -863,17 +863,17 @@
 										"$ref": "AAAAAAGG/5kytwUR0pc="
 									},
 									"font": "Arial;13;0",
-									"left": 1055,
+									"left": 1064,
 									"top": 359,
 									"width": 79.1298828125,
 									"height": 13,
-									"alpha": -1.5282686345459493,
-									"distance": 47.042533945356304,
+									"alpha": -1.6071438325154273,
+									"distance": 55.036351623268054,
 									"hostEdge": {
 										"$ref": "AAAAAAGG/5kytwUVut0="
 									},
 									"edgePosition": 1,
-									"text": "+Svolgimento"
+									"text": "+Gestione"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -887,7 +887,7 @@
 									"visible": null,
 									"font": "Arial;13;0",
 									"left": 1018,
-									"top": 361,
+									"top": 357,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 30,
@@ -908,7 +908,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 1062,
-									"top": 362,
+									"top": 358,
 									"height": 13,
 									"alpha": -1.5707963267948966,
 									"distance": 15,
@@ -927,17 +927,17 @@
 										"$ref": "AAAAAAGG/5kytwUSJv0="
 									},
 									"font": "Arial;13;0",
-									"left": 1000,
-									"top": 311,
+									"left": 1008,
+									"top": 287,
 									"width": 29.275390625,
 									"height": 13,
-									"alpha": -6.041619603466028,
-									"distance": 142.12670403551894,
+									"alpha": -6.124048587211373,
+									"distance": 164.07315441594946,
 									"hostEdge": {
 										"$ref": "AAAAAAGG/5kytwUVut0="
 									},
 									"edgePosition": 2,
-									"text": "+1..1"
+									"text": "+0..1"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -992,11 +992,11 @@
 									},
 									"font": "Arial;13;0",
 									"left": 991,
-									"top": 418,
+									"top": 432,
 									"width": 50.21630859375,
 									"height": 13,
-									"alpha": -0.21866894142586535,
-									"distance": 147.5127113166862,
+									"alpha": -0.19043511167880411,
+									"distance": 169.0562036720333,
 									"hostEdge": {
 										"$ref": "AAAAAAGG/5kytwUVut0="
 									},
@@ -1014,7 +1014,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 1019,
-									"top": 302,
+									"top": 294,
 									"height": 13,
 									"alpha": -0.7853981633974483,
 									"distance": 40,
@@ -1034,7 +1034,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 1060,
-									"top": 295,
+									"top": 287,
 									"height": 13,
 									"alpha": 0.5235987755982988,
 									"distance": 25,
@@ -1080,7 +1080,7 @@
 							"tail": {
 								"$ref": "AAAAAAGG/5glEADD+us="
 							},
-							"points": "1048:456;1048:280",
+							"points": "1048:456;1048:272",
 							"showVisibility": true,
 							"nameLabel": {
 								"$ref": "AAAAAAGG/5kytwUWRQc="
@@ -3234,14 +3234,14 @@
 							"_parent": {
 								"$ref": "AAAAAAGG/5glEADBRYI="
 							},
-							"name": "Svolgimento",
+							"name": "Gestione",
 							"end1": {
 								"_type": "UMLAssociationEnd",
 								"_id": "AAAAAAGG/5kytwUSJv0=",
 								"_parent": {
 									"$ref": "AAAAAAGG/5kytwUR0pc="
 								},
-								"name": "1..1",
+								"name": "0..1",
 								"reference": {
 									"$ref": "AAAAAAGG/5glEADBRYI="
 								}
