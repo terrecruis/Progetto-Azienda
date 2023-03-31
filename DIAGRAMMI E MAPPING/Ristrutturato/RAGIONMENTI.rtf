@@ -17,9 +17,10 @@
 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 
-\f0\b \cf0 \ul \ulc0 ACCORPAMENTO DELL\'92ENTITA\'92 DIRIGENTE ALL\'92INTERNO DELL\'92ENTITA\'92 PADRE (IMPIEGATO) :
+\f0\b \cf0 \ul ACCORPAMENTO DELL\'92ENTITA\'92 DIRIGENTE ALL\'92INTERNO DELL\'92ENTITA\'92 PADRE (IMPIEGATO) :
 \f1\b0 \
-\ulnone Siccome L\'92entit\'e0 dirigente \'e8 a tutti gli effetti un impiegato dell\'92azienda, non potevamo di certo creare due tabelle diverse con gli stessi attributi, \'e8 pi\'f9 naturale farlo attraverso un accorpamento con un flag booleano\'85 DIRIGENTE (0/1) in quanto un dirigente \'e8 anch\'92esso un IMPIEGATO.
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \ulnone Siccome L\'92entit\'e0 dirigente \'e8 a tutti gli effetti un impiegato dell\'92azienda, non potevamo di certo creare due tabelle diverse con gli stessi attributi, \'e8 pi\'f9 naturale farlo attraverso un accorpamento con un flag bool \'85 DIRIGENTE (0/1) in quanto un dirigente \'e8 anch\'92esso un IMPIEGATO.
 \fs24 \
 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
@@ -33,8 +34,9 @@ Con chiave parziale quella di NuovoRuolo, e chiave primaria la coppia matricolaI
 
 \f1\b0\fs26 \
 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 
-\f0\b \ul RAGIONAMENTO SULL\'92ASSOCIAZIONE FRA IMPIEGATO E LABORATORIO \'91AFFERENZA\'92 [\'85]
+\f0\b \cf0 \ul RAGIONAMENTO SULL\'92ASSOCIAZIONE FRA IMPIEGATO E LABORATORIO \'91 AFFERENZA \'92 [\'85]
 \fs36 \ulnone \
 \pard\tx566\tx697\tx697\tx809\tx809\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6594\tx6594\tx6594\tx6803\pardirnatural\partightenfactor0
 
@@ -45,11 +47,13 @@ Con chiave parziale quella di NuovoRuolo, e chiave primaria la coppia matricolaI
 \cf0 \ul RAGIONAMENTO SU PROGETTO E LABORATORIO
 \f1\b0 \ulnone  :
 \f0\b \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 
-\f1\b0 Come da Traccia,un Progetto pu\'f2 avere al massimo tre laboratori mentre siccome non \'e8 specificato, posso dedurre che un progetto (in fase embrionale suppogno), non abbia necessit\'e0 di gestire qualche laboratorio.\
+\f1\b0 \cf0 Come da Traccia, un Progetto pu\'f2 avere al massimo tre laboratori mentre siccome non \'e8 specificato, posso dedurre che un progetto (in fase embrionale suppongo ), non abbia necessit\'e0 di gestire qualche laboratorio.\
 \
 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 
 \f0\b \cf2 ATTRIUTO DERIVATO \'93NumeroAfferenti\'94\
 
-\f1\b0 L\'92attributo derivato NumeroAfferenti \'e8 derivabile grazie all\'92associazione con Impiegato per ogni laboratorio, ma questo implica che, nel caso non usassi questo attributo, ogni qual volta voglio visualizzare quanti impiegati lavorano in un Laboratorio, bisognerebbe passare per forza per Afferenza.. in equal modo per visualizzare gli Impiegati totali per un progetto specifico.. Questro attributo derivato \'e8 necessario nel momento in cui voglio ottimizzare queste viste.}
+\f1\b0 L\'92attributo derivato NumeroAfferenti \'e8 derivabile grazie all\'92associazione con Impiegato per ogni laboratorio, ma questo implica che, nel caso non usassi questo attributo, ogni qual volta voglio visualizzare quanti impiegati lavorano in un Laboratorio, bisognerebbe passare per forza per   Afferenza .. in egual modo per visualizzare gli Impiegati totali per un progetto specifico.. Questo attributo derivato \'e8 necessario nel momento in cui voglio ottimizzare queste viste.}
