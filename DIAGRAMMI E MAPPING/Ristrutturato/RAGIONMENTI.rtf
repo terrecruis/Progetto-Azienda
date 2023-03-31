@@ -1,24 +1,25 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2639
+{\rtf1\ansi\ansicpg1252\cocoartf2708
 \cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica-Bold;\f1\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww28600\viewh15260\viewkind0
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww16700\viewh15260\viewkind0
 \pard\tx566\tx697\tx697\tx809\tx809\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6594\tx6594\tx6594\tx6803\pardirnatural\partightenfactor0
 
-\f0\b\fs36 \cf0 SCELTE RISTRUTTURAZIONE
+\f0\b\fs36 \cf0 SCELTE RISTRUTTURAZIONE\\ALTRI COMMENTI [. . .]
 \f1\b0\fs24 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 \cf0 \
-\ul ACCORPAMENTO DI JUNION, MIDDLE, SENIOR E ACCORPAMENTO DI STORICO\
-\ulnone Conviene quando le operazioni non fanno molta distinzione tra le occorrenze di impiegato e dei suoi figli, aggiungiamo all\'92entit\'e0 Impiegato l\'92attributo : \'91TipoImpiegato\'92 \ul ,\ulnone  in questo modo abbiamo accorpato le classi figlie nella classe padre \'91Impiegato\'92.
+
+\f0\b \cf2 \ul \ulc2 ACCORPAMENTO DI JUNION, MIDDLE, SENIOR E ACCORPAMENTO DI STORICO
+\f1\b0 \cf0 \ulc0 \
+\ulnone Conviene quando le operazioni non fanno molta distinzione tra le occorrenze di impiegato e dei suoi figli, aggiungiamo all\'92entit\'e0 Impiegato l\'92attributo : \'91TipoImpiegato\'92 \ul ,\ulnone  in questo modo abbiamo accorpato le classi figlie nella classe padre \'91Impiegato\'92 garantendo valide le associazioni che la classe figlia \'93Senior\'94 ha rispetto le entit\'e0 di Laboratorio e Progetto.
 \fs26 \
 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 
 \f0\b \cf0 \ul \ulc0 ACCORPAMENTO DELL\'92ENTITA\'92 DIRIGENTE ALL\'92INTERNO DELL\'92ENTITA\'92 PADRE (IMPIEGATO) :
 \f1\b0 \
-\ulnone Siccome L\'92entit\'e0 dirigente \'e8 a tutti gli effetti un impiegato dell\'92azienda, non potevamo di certo creare due tabelle diverse con gli stessi attributi, \'e8 pi\'f9 naturale farlo attraverso un accorpamento con un flag booleano\'85 DIRIGENTE (0/1);\
-Ovviamente questo costa sulla tabella impiegato poich\'e9 molti impiegati avranno un attributo booleano superfluo[\'85]
+\ulnone Siccome L\'92entit\'e0 dirigente \'e8 a tutti gli effetti un impiegato dell\'92azienda, non potevamo di certo creare due tabelle diverse con gli stessi attributi, \'e8 pi\'f9 naturale farlo attraverso un accorpamento con un flag booleano\'85 DIRIGENTE (0/1) in quanto un dirigente \'e8 anch\'92esso un IMPIEGATO.
 \fs24 \
 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
@@ -26,7 +27,8 @@ Ovviamente questo costa sulla tabella impiegato poich\'e9 molti impiegati avrann
 \f0\b\fs28 \cf0 \ul STORICO\ulnone \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 
-\f1\b0\fs26 \cf0 Lo storico lo trattiamo come un entit\'e0 debole rispetto a \'91Impiegato\'92, questo perch\'e9 un impiegato pu\'f2 avere molti storici a seconda degli scatti di carriera fatti, e ovviamente uno storico ha per forza un impiegato a cui si riferisce.
+\f1\b0\fs26 \cf0 Lo storico lo trattiamo come un entit\'e0 debole rispetto a \'91Impiegato\'92, questo perch\'e9 un impiegato pu\'f2 avere molti storici a seconda degli scatti di carriera fatti, e ovviamente uno storico ha per forza un impiegato a cui si riferisce.\
+Con chiave parziale quella di NuovoRuolo, e chiave primaria la coppia matricolaImpiegato-NuovoRuolo.
 \f0\b\fs36 \
 
 \f1\b0\fs26 \
@@ -36,20 +38,18 @@ Ovviamente questo costa sulla tabella impiegato poich\'e9 molti impiegati avrann
 \fs36 \ulnone \
 \pard\tx566\tx697\tx697\tx809\tx809\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6594\tx6594\tx6594\tx6803\pardirnatural\partightenfactor0
 
-\f1\b0\fs26 \cf0 Un impiegato pu\'f2 afferire ad un dipartimento (0\'851), questo perch\'e9 dobbiamo tener traccia anche degli impiegati che vengono licenziati dall\'92Azienda\'85
+\f1\b0\fs26 \cf0 Un impiegato pu\'f2 afferire ad un dipartimento (0\'851), questo perch\'e9 dobbiamo tener traccia anche degli impiegati che vengono licenziati dall\'92Azienda\'85e oltre ci\'f2, dalla traccia non si evince che un impiegato lavora per tanti laboratori diversi, motivo per cui decido che questa entit\'e0 pu\'f2 afferire ad un e un solo progetto.
 \f0\b \
 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
-\cf0 \ul RAGIONAMENTO SU PROGETTO E LABORATORIO\ulnone \
+\cf0 \ul RAGIONAMENTO SU PROGETTO E LABORATORIO
+\f1\b0 \ulnone  :
+\f0\b \
 
-\f1\b0 Decido che un Progetto deve avere pu\'f2 avere al massimo tre laboratori ma,
-\f0\b\fs36 \
-\pard\tx566\tx697\tx697\tx809\tx809\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6594\tx6594\tx6594\tx6803\pardirnatural\partightenfactor0
-\cf0 \
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\f1\b0 Come da Traccia,un Progetto pu\'f2 avere al massimo tre laboratori mentre siccome non \'e8 specificato, posso dedurre che un progetto (in fase embrionale suppogno), non abbia necessit\'e0 di gestire qualche laboratorio.\
+\
+\
 
-\fs26 \cf0 CHIAVI PRIMARIE:
-\f1\b0 \
-1. Lista sulle chiavi candidate e spiegazione del perche abbiamo scelto quelle chiavi.\
-2. Spiegare sull\'92entit\'e0 debole perch\'e9 non ha chiavi\
-}
+\f0\b \cf2 ATTRIUTO DERIVATO \'93NumeroAfferenti\'94\
+
+\f1\b0 L\'92attributo derivato NumeroAfferenti \'e8 derivabile grazie all\'92associazione con Impiegato per ogni laboratorio, ma questo implica che, nel caso non usassi questo attributo, ogni qual volta voglio visualizzare quanti impiegati lavorano in un Laboratorio, bisognerebbe passare per forza per Afferenza.. in equal modo per visualizzare gli Impiegati totali per un progetto specifico.. Questro attributo derivato \'e8 necessario nel momento in cui voglio ottimizzare queste viste.}
