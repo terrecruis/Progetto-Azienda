@@ -1291,7 +1291,7 @@
 											"top": 298,
 											"width": 159,
 											"height": 13,
-											"text": "+DeadLine: date",
+											"text": "+Deadline: date",
 											"horizontalAlignment": 0
 										}
 									],
@@ -4424,7 +4424,7 @@
 							"_parent": {
 								"$ref": "AAAAAAGGxol8rFNHOao="
 							},
-							"name": "DeadLine",
+							"name": "Deadline",
 							"type": "date"
 						}
 					]
