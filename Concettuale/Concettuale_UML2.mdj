@@ -1259,13 +1259,47 @@
 											"height": 13,
 											"text": "+Budget: Decimal",
 											"horizontalAlignment": 0
+										},
+										{
+											"_type": "UMLAttributeView",
+											"_id": "AAAAAAGHN0CNE5/5Bco=",
+											"_parent": {
+												"$ref": "AAAAAAGGxol8rVNPK6E="
+											},
+											"model": {
+												"$ref": "AAAAAAGHN0CNBZ/2Ccs="
+											},
+											"font": "Arial;13;0",
+											"left": 917,
+											"top": 283,
+											"width": 159,
+											"height": 13,
+											"text": "+StartDate: date",
+											"horizontalAlignment": 0
+										},
+										{
+											"_type": "UMLAttributeView",
+											"_id": "AAAAAAGHN0DKxaDq3fs=",
+											"_parent": {
+												"$ref": "AAAAAAGGxol8rVNPK6E="
+											},
+											"model": {
+												"$ref": "AAAAAAGHN0DKt6Dn/HU="
+											},
+											"font": "Arial;13;0",
+											"left": 917,
+											"top": 298,
+											"width": 159,
+											"height": 13,
+											"text": "+DeadLine: date",
+											"horizontalAlignment": 0
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 912,
 									"top": 233,
 									"width": 169,
-									"height": 53
+									"height": 83
 								},
 								{
 									"_type": "UMLOperationCompartmentView",
@@ -1278,7 +1312,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 912,
-									"top": 286,
+									"top": 316,
 									"width": 169,
 									"height": 10
 								},
@@ -1320,7 +1354,7 @@
 							"left": 912,
 							"top": 208,
 							"width": 169,
-							"height": 89,
+							"height": 118,
 							"nameCompartment": {
 								"$ref": "AAAAAAGGxol8rVNKrwY="
 							},
@@ -2596,7 +2630,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 895,
-									"top": 369,
+									"top": 383,
 									"width": 79.13623046875,
 									"height": 13,
 									"alpha": -4.732794178248124,
@@ -2619,7 +2653,7 @@
 									"visible": null,
 									"font": "Arial;13;0",
 									"left": 954,
-									"top": 369,
+									"top": 383,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 30,
@@ -2640,7 +2674,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 998,
-									"top": 370,
+									"top": 384,
 									"height": 13,
 									"alpha": -1.5707963267948966,
 									"distance": 15,
@@ -2724,7 +2758,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 991,
-									"top": 303,
+									"top": 332,
 									"width": 32.88720703125,
 									"height": 13,
 									"alpha": 1.0240076165090364,
@@ -2746,7 +2780,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 955,
-									"top": 318,
+									"top": 347,
 									"height": 13,
 									"alpha": -0.7853981633974483,
 									"distance": 40,
@@ -2766,7 +2800,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 996,
-									"top": 311,
+									"top": 340,
 									"height": 13,
 									"alpha": 0.5235987755982988,
 									"distance": 25,
@@ -2814,7 +2848,7 @@
 							"tail": {
 								"$ref": "AAAAAAGGxolUf1Mf608="
 							},
-							"points": "984:456;984:296",
+							"points": "984:456;984:325",
 							"showVisibility": true,
 							"nameLabel": {
 								"$ref": "AAAAAAGGxpPAXdfjLxU="
@@ -4374,6 +4408,24 @@
 							},
 							"name": "Budget",
 							"type": "Decimal"
+						},
+						{
+							"_type": "UMLAttribute",
+							"_id": "AAAAAAGHN0CNBZ/2Ccs=",
+							"_parent": {
+								"$ref": "AAAAAAGGxol8rFNHOao="
+							},
+							"name": "StartDate",
+							"type": "date"
+						},
+						{
+							"_type": "UMLAttribute",
+							"_id": "AAAAAAGHN0DKt6Dn/HU=",
+							"_parent": {
+								"$ref": "AAAAAAGGxol8rFNHOao="
+							},
+							"name": "DeadLine",
+							"type": "date"
 						}
 					]
 				},
