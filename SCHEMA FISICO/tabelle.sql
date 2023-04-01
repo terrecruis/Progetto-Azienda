@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS IMPIEGATO
 	dirigente BOOLEAN NOT NULL,
 
 	CONSTRAINT impiegato_pk PRIMARY KEY(matricola),
+	CONSTRAINT stipendio_corretto CHECK(stipendio > 0),
 	CONSTRAINT sesso_corretto CHECK(sesso = 'M' OR sesso = 'F')
 );
 
@@ -36,7 +37,7 @@ CREATE TABLE IF NOT EXISTS LABORATORIO
 	id_laboratorio VARCHAR,
 	topic VARCHAR NOT NULL,
 	indirizzo VARCHAR NOT NULL,
-	numero_telefono VARCHAR NOT NULL,
+	numero_telefono VARCHAR,
 	numero_afferenti INTEGER DEFAULT 0,
 	mat_responsabile VARCHAR NOT NULL,
 
@@ -91,3 +92,8 @@ CREATE TABLE IF NOT EXISTS GESTIONE
 	CONSTRAINT gestione_progetto_pk FOREIGN KEY(cup_prog) REFERENCES PROGETTO(cup),
 	CONSTRAINT gestione_laboratorio_pk FOREIGN KEY(id_lab) REFERENCES LABORATORIO(id_laboratorio)
 );
+
+/*Creazione di almeno DUE VIEW :
+	1. Storico di un impiegato : Nome, Cognome, DATASCATTOJUNIOR, DATASCATTOMIDDLE, DATASCATTASENIOR. 
+	2. Progetto : NomeProg, LABORATORIO1_ID, LABORATORIO2_ID, LABORATORIO3_ID, NUMERO TOTALI AFFERENTI. 
+*/
