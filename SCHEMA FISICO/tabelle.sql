@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS IMPIEGATO
 	stipendio DECIMAL(12,2) NOT NULL,
 	sesso CHAR NOT NULL,
 	foto BYTEA,
-	tipo_impiegato DOMINIO_IMPIEGATO NOT NULL,
-	dirigente BOOLEAN NOT NULL,
+	tipo_impiegato DOMINIO_IMPIEGATO NOT NULL DEFAULT 'junior',
+	dirigente BOOLEAN NOT NULL DEFAULT false,
 
 	CONSTRAINT impiegato_pk PRIMARY KEY(matricola),
 	CONSTRAINT stipendio_corretto CHECK(stipendio > 0),
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS PROGETTO
 	nome_progetto VARCHAR UNIQUE NOT NULL,
 	budget DECIMAL(12,2) NOT NULL,
 	data_inizio DATE NOT NULL,
-	data_fine DATE,  				--poichè data_fine non è immediatamente decisa al momento della creazione--
+	data_fine DATE DEFAULT NULL,  				--poichè data_fine non è immediatamente decisa al momento della creazione--
 	mat_dirigente VARCHAR NOT NULL,
 	mat_referente VARCHAR NOT NULL,
 
@@ -105,4 +105,46 @@ CREATE TABLE IF NOT EXISTS GESTIONE
 /*Creazione di almeno DUE VIEW :
 	1. Storico di un impiegato : Nome, Cognome, DATASCATTOJUNIOR, DATASCATTOMIDDLE, DATASCATTASENIOR. 
 	2. Progetto : NomeProg, LABORATORIO1_ID, LABORATORIO2_ID, LABORATORIO3_ID, NUMERO TOTALI AFFERENTI. 
+
+	TRIGGER:
+	1. controllo in caso di delete di un referente o responsabile
+	2. potremmo fare qualche vincolo di integrita semantica
+	(esempio un junior non puo avere lo stipendio piu alto di un senior)
+	3. 
 */
+
+--DUMP DEI DATI
+--I nomi dei dipendenti generati casualmente
+
+INSERT INTO IMPIEGATO (matricola,nome,cognome,codice_fiscale,curriculum,stipendio,sesso,responsabile)
+VALUES
+('111','Saverio','Babati','BBTSVR98E15A794R','il mio curriculum',2500,'M',true),
+('112','Gianfranco','Pirandello','PRNGFR90B12F839V','il mio curriculum',2200,'M',true),
+('113','Luigina','Blasi','BLSLGN00S52B157E','il mio curriculum',1800,'F',false),
+('114','Amedeo','Malatesta','MLTMDA83H30L219N','il mio curriculum',2000,'M',true),
+('115','Eva','Zamorani','ZMRVEA04C57F205Y','il mio curriculum',1800,'F',false)
+
+RETURNING *;
+
+INSERT INTO IMPIEGATO (matricola,nome,cognome,codice_fiscale,curriculum,stipendio,sesso,responsabile,tipo_impiegato)
+VALUES
+('116','Francesco','Sborbati','BBRSVR98315A784R','il mio curriculum',2500,'M',false,'senior'),
+RETURNING *;
+
+
+
+INSERT INTO LABORATORIO (id_laboratorio,topic,indirizzo,numero_telefono,mat_responsabile)
+VALUES
+('lab01','ricerca e sviluppo','Via Laviano,17','338 382 8556','111')
+RETURN *;
+
+INSERT INTO PROGETTO (cup,nome_progetto,budget,data_inizio,mat_dirigente,mat_referente)
+VALUES
+('prog1','Formazione Phyton',10 000,2023/3/15,'116','112')
+RETURN *;
+
+
+
+
+
+
