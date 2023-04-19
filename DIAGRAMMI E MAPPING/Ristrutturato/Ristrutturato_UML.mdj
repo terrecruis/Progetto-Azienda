@@ -1253,12 +1253,12 @@
 										"$ref": "AAAAAAGG/5p5EBENHEI="
 									},
 									"font": "Arial;13;0",
-									"left": 669,
+									"left": 671,
 									"top": 491,
 									"width": 30.71630859375,
 									"height": 13,
-									"alpha": 0.5235987755982988,
-									"distance": 30,
+									"alpha": 0.507098347159677,
+									"distance": 30.886890422961002,
 									"hostEdge": {
 										"$ref": "AAAAAAGG/5p5EREQlnM="
 									},
@@ -1317,16 +1317,16 @@
 										"$ref": "AAAAAAGG/5p5EBEOrRI="
 									},
 									"font": "Arial;13;0",
-									"left": 934,
-									"top": 491,
+									"left": 927,
+									"top": 490,
 									"width": 32.88720703125,
 									"height": 13,
-									"alpha": -0.5235987755982988,
-									"distance": 30,
+									"alpha": -0.426627607282156,
+									"distance": 36.24913792078372,
 									"hostEdge": {
 										"$ref": "AAAAAAGG/5p5EREQlnM="
 									},
-									"text": "+0...1"
+									"text": "+0...*"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -2019,7 +2019,7 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": -112,
+											"left": -32,
 											"top": -80,
 											"height": 13
 										},
@@ -2030,7 +2030,7 @@
 												"$ref": "AAAAAAGHCg63aUj1llE="
 											},
 											"font": "Arial;13;1",
-											"left": 733,
+											"left": 773,
 											"top": 375,
 											"width": 167,
 											"height": 13,
@@ -2044,7 +2044,7 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": -112,
+											"left": -32,
 											"top": -80,
 											"width": 73.67724609375,
 											"height": 13,
@@ -2058,14 +2058,14 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": -112,
+											"left": -32,
 											"top": -80,
 											"height": 13,
 											"horizontalAlignment": 1
 										}
 									],
 									"font": "Arial;13;0",
-									"left": 728,
+									"left": 768,
 									"top": 368,
 									"width": 177,
 									"height": 25,
@@ -2102,7 +2102,7 @@
 												"$ref": "AAAAAAGHCiEcxgdJ3qg="
 											},
 											"font": "Arial;13;0",
-											"left": 733,
+											"left": 773,
 											"top": 398,
 											"width": 167,
 											"height": 13,
@@ -2119,7 +2119,7 @@
 												"$ref": "AAAAAAGHLFKJT2nCR58="
 											},
 											"font": "Arial;13;0",
-											"left": 733,
+											"left": 773,
 											"top": 413,
 											"width": 167,
 											"height": 13,
@@ -2128,7 +2128,7 @@
 										}
 									],
 									"font": "Arial;13;0",
-									"left": 728,
+									"left": 768,
 									"top": 393,
 									"width": 177,
 									"height": 38
@@ -2143,7 +2143,7 @@
 										"$ref": "AAAAAAGHCg63aEjyqLo="
 									},
 									"font": "Arial;13;0",
-									"left": 728,
+									"left": 768,
 									"top": 431,
 									"width": 177,
 									"height": 10
@@ -2159,7 +2159,7 @@
 									},
 									"visible": false,
 									"font": "Arial;13;0",
-									"left": -56,
+									"left": -16,
 									"top": -40,
 									"width": 10,
 									"height": 10
@@ -2175,7 +2175,7 @@
 									},
 									"visible": false,
 									"font": "Arial;13;0",
-									"left": -56,
+									"left": -16,
 									"top": -40,
 									"width": 10,
 									"height": 10
@@ -2183,7 +2183,7 @@
 							],
 							"font": "Arial;13;0",
 							"containerChangeable": true,
-							"left": 728,
+							"left": 768,
 							"top": 368,
 							"width": 177,
 							"height": 73,
@@ -2220,7 +2220,7 @@
 								"$ref": "AAAAAAGHCg63aUj00SY="
 							},
 							"lineStyle": 1,
-							"points": "816:441;816:511;817:512"
+							"points": "842:441;816:511;817:512"
 						},
 						{
 							"_type": "UMLClassView",
@@ -3005,8 +3005,8 @@
 								"$ref": "AAAAAAFF+qBtyKM79qY="
 							},
 							"font": "Arial;13;0",
-							"left": 1280,
-							"top": 336,
+							"left": 1264,
+							"top": 312,
 							"width": 74.1962890625,
 							"height": 103,
 							"text": "sono massimo tre laboratori per un progetto"
@@ -3044,7 +3044,7 @@
 								"_parent": {
 									"$ref": "AAAAAAGG/5p5EBEMBGU="
 								},
-								"name": "0...1",
+								"name": "0...*",
 								"reference": {
 									"$ref": "AAAAAAGG/5glEADBRYI="
 								}

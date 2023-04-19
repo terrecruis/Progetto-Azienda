@@ -1,11 +1,17 @@
 /*
 	Questa parte è inerente al DDL : Data Definition Language 
-	in cui creaimo lo Schema, le tabelle, domini, viste, e i vincoli (di tabelle):
-	1. Vincoli su valori NULL e valori predefiniti
-	2. Vincoli sulle tuple (CHECK)
-	3. vincoli sui domini degli attributi
-	4. Vincoli di chiave
-	5. Vincoli di integrità referenziale
+*/
+
+
+/*
+	SCHEMA LOGICO:
+
+IMPIEGATO(matricola, nome, cognome, cf, curriculum, stipendio, sesso, foto, tipo, dirigente)
+LABORATORIO(id_lab, topic, indirizzo, numero_telefono, numero_afferenti, responsabile)
+PROGETTO(CUP, nome_progetto, budget, data_inizio, data_fine, dirigente, referente)
+STORICO(ruolo_prec, nuovo_ruolo, data_scatto, matricola)
+AFFERENZA(matricola, id_lab, ore_giornaliere, tipo_contratto)
+GESTIONE(cup, id_lab)
 */
 
 
@@ -19,13 +25,13 @@ CREATE TABLE IF NOT EXISTS IMPIEGATO
 	matricola VARCHAR,
 	nome VARCHAR NOT NULL,
 	cognome VARCHAR NOT NULL,
-	codice_fiscale CHAR(16) NOT NULL UNIQUE,
+	cf CHAR(16) NOT NULL UNIQUE, --codice fiscale
 	curriculum VARCHAR, 
 	stipendio DECIMAL(12,2) NOT NULL,
 	sesso CHAR NOT NULL,
 	foto BYTEA,
 	tipo_impiegato DOMINIO_IMPIEGATO NOT NULL DEFAULT 'junior',
-	dirigente BOOLEAN NOT NULL DEFAULT false,
+	dirigente BOOLEAN NOT NULL DEFAULT 0,
 
 	CONSTRAINT impiegato_pk PRIMARY KEY(matricola),
 	CONSTRAINT stipendio_corretto CHECK(stipendio > 0),
@@ -34,16 +40,16 @@ CREATE TABLE IF NOT EXISTS IMPIEGATO
 
 CREATE TABLE IF NOT EXISTS LABORATORIO
 (
-	id_laboratorio VARCHAR,
+	id_lab VARCHAR,
 	topic VARCHAR NOT NULL,
 	indirizzo VARCHAR NOT NULL,
 	numero_telefono VARCHAR,
 	numero_afferenti INTEGER DEFAULT 0,
-	mat_responsabile VARCHAR NOT NULL,
+	responsabile VARCHAR NOT NULL,
 
-	CONSTRAINT responsabile_scientifico_fk FOREIGN KEY(mat_responsabile) REFERENCES IMPIEGATO(matricola)
+	CONSTRAINT responsabile_scientifico_fk FOREIGN KEY(responsabile) REFERENCES IMPIEGATO(matricola)
 		ON UPDATE CASCADE,
-	CONSTRAINT id_laboratorio_pk PRIMARY KEY(id_laboratorio)
+	CONSTRAINT id_lab_pk PRIMARY KEY(id_lab)
 );
 
 CREATE TABLE IF NOT EXISTS PROGETTO
@@ -53,14 +59,16 @@ CREATE TABLE IF NOT EXISTS PROGETTO
 	budget DECIMAL(12,2) NOT NULL,
 	data_inizio DATE NOT NULL,
 	data_fine DATE DEFAULT NULL,  				--poichè data_fine non è immediatamente decisa al momento della creazione--
-	mat_dirigente VARCHAR NOT NULL,
-	mat_referente VARCHAR NOT NULL,
+	dirigente VARCHAR NOT NULL,
+	referente VARCHAR NOT NULL,
 
+
+	CONSTRAINT stipendio_corretto CHECK(budget > 0),
 	CONSTRAINT cup_pk PRIMARY KEY(cup),
-	CONSTRAINT responsabile_progetto_fk FOREIGN KEY(mat_dirigente) REFERENCES IMPIEGATO(matricola)
+	CONSTRAINT responsabile_progetto_fk FOREIGN KEY(dirigente) REFERENCES IMPIEGATO(matricola)
 		ON UPDATE CASCADE,
 
-	CONSTRAINT referente_progetto_fk FOREIGN key(mat_referente)    REFERENCES IMPIEGATO(matricola)
+	CONSTRAINT referente_progetto_fk FOREIGN key(referente)    REFERENCES IMPIEGATO(matricola)
 		ON UPDATE CASCADE
 );
 
@@ -69,10 +77,10 @@ CREATE TABLE IF NOT EXISTS STORICO
 	ruolo_prec DOMINIO_IMPIEGATO,
 	nuovo_ruolo DOMINIO_IMPIEGATO NOT NULL,
 	data_scatto DATE NOT NULL,
-	mat_impiegato VARCHAR,
+	matricola VARCHAR,
 
-	CONSTRAINT storico_pk PRIMARY KEY(nuovo_ruolo, mat_impiegato),
-	CONSTRAINT mat_impiegato_fk FOREIGN KEY(mat_impiegato) REFERENCES IMPIEGATO(matricola)
+	CONSTRAINT storico_pk PRIMARY KEY(nuovo_ruolo, matricola),
+	CONSTRAINT matricola_fk FOREIGN KEY(matricola) REFERENCES IMPIEGATO(matricola)
 		ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -80,13 +88,13 @@ CREATE TABLE IF NOT EXISTS AFFERENZA
 (
 	ore_giornaliere INTEGER NOT NULL,
 	tipo_contratto DOMINIO_CONTRATTO NOT NULL,
-	mat_impiegato VARCHAR NOT NULL,
+	matricola VARCHAR NOT NULL,
 	id_lab VARCHAR NOT NULL,
 
-	CONSTRAINT mat_impiegato_afferenza_pk PRIMARY KEY(mat_impiegato),
-	CONSTRAINT impiegato_afferenza_fk FOREIGN KEY(mat_impiegato) REFERENCES IMPIEGATO(matricola)
+	CONSTRAINT matricola_afferenza_pk PRIMARY KEY(matricola),
+	CONSTRAINT impiegato_afferenza_fk FOREIGN KEY(matricola) REFERENCES IMPIEGATO(matricola)
 		ON DELETE CASCADE 	ON UPDATE CASCADE,
-	CONSTRAINT afferenza_laboratorio_fk FOREIGN KEY(id_lab) REFERENCES LABORATORIO(id_laboratorio)
+	CONSTRAINT afferenza_laboratorio_fk FOREIGN KEY(id_lab) REFERENCES LABORATORIO(id_lab)
 		ON DELETE CASCADE	ON UPDATE CASCADE
 );
 
@@ -98,50 +106,42 @@ CREATE TABLE IF NOT EXISTS GESTIONE
 	CONSTRAINT cup_id_pk PRIMARY KEY(cup_prog, id_lab),
 	CONSTRAINT gestione_progetto_pk FOREIGN KEY(cup_prog) REFERENCES PROGETTO(cup)
 		ON UPDATE CASCADE	ON DELETE CASCADE,
-	CONSTRAINT gestione_laboratorio_pk FOREIGN KEY(id_lab) REFERENCES LABORATORIO(id_laboratorio)
+	CONSTRAINT gestione_laboratorio_pk FOREIGN KEY(id_lab) REFERENCES LABORATORIO(id_lab)
 		ON UPDATE CASCADE	ON DELETE CASCADE
 );
 
 /*Creazione di almeno DUE VIEW :
 	1. Storico di un impiegato : Nome, Cognome, DATASCATTOJUNIOR, DATASCATTOMIDDLE, DATASCATTASENIOR. 
-	2. Progetto : NomeProg, LABORATORIO1_ID, LABORATORIO2_ID, LABORATORIO3_ID, NUMERO TOTALI AFFERENTI. 
+	2. Progetto : NomeProg, LABORATORIO1_ID, LABORATORIO2_ID, LABORATORIO3_ID, NUMERO TOTALI AFFERENTI.
+	3. Stipendi medi per laboratorio : Laboratorio, avg(stipendio)
 
 	TRIGGER:
 	1. controllo in caso di delete di un referente o responsabile
 	2. potremmo fare qualche vincolo di integrita semantica
-	(esempio un junior non puo avere lo stipendio piu alto di un senior)
-	3. 
+		(esempio un junior non puo avere lo stipendio piu alto di un senior)
+	3. controllare che un impiegato non lavora per più di otto ore al giorno
+	4. controllare che per un progetto non vi siano al più di 3 laboratori
+	5. controlla che nel momento in cui inserisco all'interno di un progetto, siano definiti referenti e responsabili.
+	6. controllo che referente e dirigente di un prog , responsabile di un lab
+	7. quando il contratto è determinato,  
+	8. quando si inserisci una data_fine ad un progetto, allora rimuovere tutti gli impiegati dai laboratori che lavorano
+	   per quel progetto settando dirigente e referente a null[...]
+	9. 
+
+	FUNZIONI/PROCEDURE :
+	1.
+	2.
+	3.
+
+
+	SQL DINAMICO :
+	1.
+	2.
+	3.
+	4.
+
 */
 
---DUMP DEI DATI
---I nomi dei dipendenti generati casualmente
-
-INSERT INTO IMPIEGATO (matricola,nome,cognome,codice_fiscale,curriculum,stipendio,sesso,responsabile)
-VALUES
-('111','Saverio','Babati','BBTSVR98E15A794R','il mio curriculum',2500,'M',true),
-('112','Gianfranco','Pirandello','PRNGFR90B12F839V','il mio curriculum',2200,'M',true),
-('113','Luigina','Blasi','BLSLGN00S52B157E','il mio curriculum',1800,'F',false),
-('114','Amedeo','Malatesta','MLTMDA83H30L219N','il mio curriculum',2000,'M',true),
-('115','Eva','Zamorani','ZMRVEA04C57F205Y','il mio curriculum',1800,'F',false)
-
-RETURNING *;
-
-INSERT INTO IMPIEGATO (matricola,nome,cognome,codice_fiscale,curriculum,stipendio,sesso,responsabile,tipo_impiegato)
-VALUES
-('116','Francesco','Sborbati','BBRSVR98315A784R','il mio curriculum',2500,'M',false,'senior'),
-RETURNING *;
-
-
-
-INSERT INTO LABORATORIO (id_laboratorio,topic,indirizzo,numero_telefono,mat_responsabile)
-VALUES
-('lab01','ricerca e sviluppo','Via Laviano,17','338 382 8556','111')
-RETURN *;
-
-INSERT INTO PROGETTO (cup,nome_progetto,budget,data_inizio,mat_dirigente,mat_referente)
-VALUES
-('prog1','Formazione Phyton',10 000,2023/3/15,'116','112')
-RETURN *;
 
 
 
