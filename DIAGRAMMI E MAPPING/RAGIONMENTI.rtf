@@ -2,7 +2,7 @@
 \cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica-Bold;\f1\fswiss\fcharset0 Helvetica;}
 {\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
 {\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww18500\viewh15260\viewkind0
+\paperw11900\paperh16840\margl1440\margr1440\vieww23180\viewh15260\viewkind0
 \pard\tx566\tx697\tx697\tx809\tx809\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6594\tx6594\tx6594\tx6803\pardirnatural\partightenfactor0
 
 \f0\b\fs36 \cf0 SCELTE RISTRUTTURAZIONE\\ALTRI COMMENTI [. . .]
@@ -40,9 +40,12 @@ Con chiave parziale quella di NuovoRuolo, e chiave primaria la coppia matricolaI
 \fs36 \ulnone \
 \pard\tx566\tx697\tx697\tx809\tx809\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6594\tx6594\tx6594\tx6803\pardirnatural\partightenfactor0
 
-\f1\b0\fs26 \cf0 Un impiegato pu\'f2 afferire ad un dipartimento (0\'851), questo perch\'e9 dobbiamo tener traccia anche degli impiegati che vengono licenziati dall\'92Azienda\'85e oltre ci\'f2, dalla traccia non si evince il tipo di relazione possibile, motivo per cui decido di mappare in modo pi\'f9 generale in uno scenario aziendale in cui un impiegato pu\'f2 lavorare a pi\'f9 laboratori diversi. 
-\f0\b \
-\
+\f1\b0\fs26 \cf0 Un impiegato pu\'f2 afferire ad un dipartimento (0\'851), questo perch\'e9 dobbiamo tener traccia anche degli impiegati che vengono licenziati dall\'92Azienda\'85e oltre ci\'f2, dalla traccia non si evince il tipo di relazione possibile, motivo per cui decido di mappare in modo pi\'f9 generale in uno scenario aziendale in cui un impiegato pu\'f2 lavorare a pi\'f9 laboratori diversi. \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf2 Mentre un responsabile scientifico pu\'f2 essere associato ad un unico laboratorio in quanto esperto in quella materia.
+\f0\b \cf0 \
+\pard\tx566\tx697\tx697\tx809\tx809\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6594\tx6594\tx6594\tx6803\pardirnatural\partightenfactor0
+\cf0 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 \cf0 \ul RAGIONAMENTO SU PROGETTO E LABORATORIO
 \f1\b0 \ulnone  :
@@ -54,6 +57,17 @@ Con chiave parziale quella di NuovoRuolo, e chiave primaria la coppia matricolaI
 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 
-\f0\b \cf2 ATTRIUTO DERIVATO \'93NumeroAfferenti\'94\
+\f0\b \cf2 ATTRIBUTO DERIVATO \'93NumeroAfferenti\'94\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 
-\f1\b0 L\'92attributo derivato NumeroAfferenti \'e8 derivabile grazie all\'92associazione con Impiegato per ogni laboratorio, ma questo implica che, nel caso non usassi questo attributo, ogni qual volta voglio visualizzare quanti impiegati lavorano in un Laboratorio, bisognerebbe passare per forza per   Afferenza .. in egual modo per visualizzare gli Impiegati totali per un progetto specifico.. Questo attributo derivato \'e8 necessario nel momento in cui voglio ottimizzare queste viste.}
+\f1\b0 \cf2 L\'92attributo derivato NumeroAfferenti \'e8 derivabile grazie all\'92associazione con Impiegato per ogni laboratorio, ma questo implica che, nel caso non usassi questo attributo, ogni qual volta voglio visualizzare quanti impiegati lavorano in un Laboratorio, bisognerebbe passare per forza per   Afferenza \'85 in egual modo per visualizzare gli Impiegati totali per un progetto specifico.. Questo attributo derivato \'e8 necessario nel momento in cui voglio ottimizzare queste viste.\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\b \cf2 \ul RESPONSABILITA\'92 e discorso su responsabile e referente\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f1\b0 \cf2 \ulnone Siccome da traccia non \'e8 specificato a quanti progetti un dirigente pu\'f2 essere associato, allora per generalizzare considero che il dirigente pu\'f2 essere responsabile a pi\'f9 progetti, motivo per il quale la classe ad associazione \'91responsabilit\'e0\'92, terr\'e0 traccia di tutti i progetti a cui un dirigente ha fatto da responsabile.\
+Cosi teniamo traccia non solo degli storici di un impiegato ma anche a quali progetti un dirigente \'e8 responsabile.\
+Il responsabile pu\'f2 avere molti progetti a cui \'e8 associato.\
+Il referente pu\'f2 avere molti progetti a cui \'e8 associato.}

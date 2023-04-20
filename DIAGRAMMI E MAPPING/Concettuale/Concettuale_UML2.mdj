@@ -2922,9 +2922,9 @@
 										"$ref": "AAAAAAGGxpVA7ATzTWY="
 									},
 									"font": "Arial;13;0",
-									"left": 928,
+									"left": 916,
 									"top": 744,
-									"width": 59.62353515625,
+									"width": 82.01806640625,
 									"height": 13,
 									"alpha": -4.646135356244371,
 									"distance": 211.463944917331,
@@ -2932,7 +2932,7 @@
 										"$ref": "AAAAAAGGxpVA7QT3hiw="
 									},
 									"edgePosition": 1,
-									"text": "+referente"
+									"text": "+referenzialità"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -3059,7 +3059,7 @@
 									"hostEdge": {
 										"$ref": "AAAAAAGGxpVA7QT3hiw="
 									},
-									"text": "+0..1"
+									"text": "+0..*"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -3197,7 +3197,6 @@
 									"model": {
 										"$ref": "AAAAAAGGxs1JRqO4KX0="
 									},
-									"visible": false,
 									"font": "Arial;13;0",
 									"left": 731,
 									"top": 239,
@@ -3336,7 +3335,7 @@
 									"hostEdge": {
 										"$ref": "AAAAAAGGxs1JR6O87LU="
 									},
-									"text": "+0...1"
+									"text": "+0...*"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -4287,7 +4286,7 @@
 							"_parent": {
 								"$ref": "AAAAAAGGxolGoFLz4Yk="
 							},
-							"name": "referente",
+							"name": "referenzialità",
 							"end1": {
 								"_type": "UMLAssociationEnd",
 								"_id": "AAAAAAGGxpVA7AT0OTs=",
@@ -4305,7 +4304,7 @@
 								"_parent": {
 									"$ref": "AAAAAAGGxpVA7ATzTWY="
 								},
-								"name": "0..1",
+								"name": "0..*",
 								"reference": {
 									"$ref": "AAAAAAGGxol8rFNHOao="
 								}
@@ -4469,6 +4468,7 @@
 							"_parent": {
 								"$ref": "AAAAAAGGxopFxVP+A8s="
 							},
+							"name": "responsabilità",
 							"end1": {
 								"_type": "UMLAssociationEnd",
 								"_id": "AAAAAAGGxs1JRqO51vY=",
@@ -4486,7 +4486,7 @@
 								"_parent": {
 									"$ref": "AAAAAAGGxs1JRqO4KX0="
 								},
-								"name": "0...1",
+								"name": "0...*",
 								"reference": {
 									"$ref": "AAAAAAGGxol8rFNHOao="
 								}
