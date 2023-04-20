@@ -12,6 +12,7 @@ PROGETTO(CUP, nome_progetto, budget, data_inizio, data_fine, dirigente, referent
 STORICO(ruolo_prec, nuovo_ruolo, data_scatto, matricola)
 AFFERENZA(matricola, id_lab, ore_giornaliere, tipo_contratto)
 GESTIONE(cup, id_lab)
+
 */
 
 
@@ -110,8 +111,10 @@ CREATE TABLE IF NOT EXISTS GESTIONE
 		ON UPDATE CASCADE	ON DELETE CASCADE
 );
 
-/*Creazione di almeno DUE VIEW :
-	1. Storico di un impiegato : Nome, Cognome, DATASCATTOJUNIOR, DATASCATTOMIDDLE, DATASCATTASENIOR. 
+/*	
+
+	Creazione di almeno VIEW :
+	1. Storico di un impiegato : Nome, Cognome, DATASCATTOJUNIOR, DATASCATTOMIDDLE, DATASCATTASENIOR, DIRIGENTE.
 	2. Progetto : NomeProg, LABORATORIO1_ID, LABORATORIO2_ID, LABORATORIO3_ID, NUMERO TOTALI AFFERENTI.
 	3. Stipendi medi per laboratorio : Laboratorio, avg(stipendio)
 
@@ -126,7 +129,7 @@ CREATE TABLE IF NOT EXISTS GESTIONE
 	7. quando il contratto è determinato,  
 	8. quando si inserisci una data_fine ad un progetto, allora rimuovere tutti gli impiegati dai laboratori che lavorano
 	   per quel progetto settando dirigente e referente a null[...]
-	9. 
+	9. se un laboratorio non lavora su alcun progetto, allora gli impiegati non vi possono partecipare.
 
 	FUNZIONI/PROCEDURE :
 	1.
@@ -135,7 +138,7 @@ CREATE TABLE IF NOT EXISTS GESTIONE
 
 
 	SQL DINAMICO :
-	1.
+	1. 
 	2.
 	3.
 	4.

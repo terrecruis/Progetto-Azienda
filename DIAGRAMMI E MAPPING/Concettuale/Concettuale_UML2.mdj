@@ -2444,7 +2444,7 @@
 										"$ref": "AAAAAAGGxpK96LsjeSM="
 									},
 									"edgePosition": 2,
-									"text": "+0...1"
+									"text": "+0...*"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -2775,11 +2775,11 @@
 									},
 									"font": "Arial;13;0",
 									"left": 1023,
-									"top": 332,
+									"top": 334,
 									"width": 32.88720703125,
 									"height": 13,
-									"alpha": 1.0240076165090364,
-									"distance": 26.92582403567252,
+									"alpha": 0.9629944581666546,
+									"distance": 28.0178514522438,
 									"hostEdge": {
 										"$ref": "AAAAAAGGxpPAXdfirOU="
 									},
@@ -4062,8 +4062,8 @@
 								"$ref": "AAAAAAFF+qBtyKM79qY="
 							},
 							"font": "Arial;13;0",
-							"left": 1240,
-							"top": 384,
+							"left": 1208,
+							"top": 352,
 							"width": 74.1962890625,
 							"height": 90,
 							"text": "Sono massimo tre laboratori per un progetto."
@@ -4090,7 +4090,7 @@
 								"_parent": {
 									"$ref": "AAAAAAGGxpK957sfedw="
 								},
-								"name": "0...1",
+								"name": "0...*",
 								"reference": {
 									"$ref": "AAAAAAGGxokJd1J19jI="
 								}
