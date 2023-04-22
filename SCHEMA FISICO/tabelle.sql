@@ -34,11 +34,10 @@ CREATE TABLE IF NOT EXISTS IMPIEGATO
 	foto BYTEA,
 	tipo_impiegato DOMINIO_IMPIEGATO NOT NULL DEFAULT 'junior',
 	dirigente BOOLEAN NOT NULL DEFAULT FALSE,
-	data_licenziamento date DEFAULT null,
 	data_assunzione date not null;
+	data_licenziamento date DEFAULT null,
 
-
-	CONSTRAINT data_corretta CHECK(data_assunzione<data_licenziamento);
+	CONSTRAINT data_corretta CHECK(data_assunzione < data_licenziamento);
 	CONSTRAINT impiegato_pk PRIMARY KEY(matricola),
 	CONSTRAINT stipendio_corretto CHECK(stipendio > 0),
 	CONSTRAINT sesso_corretto CHECK(sesso = 'M' OR sesso = 'F')
@@ -71,7 +70,8 @@ CREATE TABLE IF NOT EXISTS PROGETTO
 	CONSTRAINT budget_corretto CHECK(budget > 0),
 	CONSTRAINT cup_pk PRIMARY KEY(cup),
 
-	--nel caso in cui aggiorno la matricola in impiegato allora l'aggiorno anche in progetto.
+	--nel caso in cui aggiorno la matricola in impiegato allora l'aggiorno anche in progetto,
+	--nel caso di delete, entra un trigger in funzione
 	constraint pk_respnsabilità FOREIGN KEY(responsabile) REFERENCES IMPIEGATO(matricola)
 		ON UPDATE CASCADE,
 	constraint pk_referente FOREIGN KEY(referente) REFERENCES IMPIEGATO(matricola)
@@ -81,20 +81,23 @@ CREATE TABLE IF NOT EXISTS PROGETTO
 
 CREATE TABLE IF NOT EXISTS STORICO
 (
-	ruolo_prec DOMINIO_IMPIEGATO,
+	--dominio scatto tiene conto anche degli scatti dirigenziali.
+	ruolo_prec DOMINIO_SCATTO,
 	nuovo_ruolo DOMINIO_SCATTO NOT NULL, 
 	data_scatto DATE NOT NULL,
 	matricola VARCHAR,
 
 	CONSTRAINT storico_pk PRIMARY KEY(nuovo_ruolo, matricola),
 	CONSTRAINT matricola_fk FOREIGN KEY(matricola) REFERENCES IMPIEGATO(matricola),
-	CONSTRAINT check_ruolo CHECK(((ruolo_prec is NULL) AND (nuovo_ruolo = 'junior')) or 
+	--i primi tre casi sono quando inserisco un impiegato già senior o middle, o junior.
+	CONSTRAINT check_ruolo CHECK(((ruolo_prec is NULL) AND (nuovo_ruolo = 'junior')) 
+								 ((ruolo_prec is NULL) AND (nuovo_ruolo = 'middle'))  
+								 ((ruolo_prec is NULL) AND (nuovo_ruolo = 'senior'))
+								 or --oppure controllo il corretto flusso di scatti possibili.
 								  ((ruolo_prec = 'junior') AND (nuovo_ruolo = 'middle')) or
 								  ((ruolo_prec = 'middle') AND (nuovo_ruolo = 'senior'))  or
-								  	(ruolo_prec = 'NonDirigente') AND (nuovo_ruolo = 'dirigente')
+								  	(ruolo_prec = 'NonDirigente') AND (nuovo_ruolo = 'dirigente') or
 									(ruolo_prec = 'dirigente') AND (nuovo_ruolo = 'NonDirigente'));
-
- --tutti i possibili scatti di ruolo affinchè sia valido.
 );
 
 CREATE TABLE IF NOT EXISTS AFFERENZA
@@ -135,76 +138,3 @@ CREATE TABLE IF NOT EXISTS GESTIONE
 );
 
 
-/*	
-	_________________________________________________________________________________________________________________
-
-	TRIGGER SU IMPIEGATO:
-	
-	(parte sullo storico e aggiornamento del database)
-1	0.0 Ogni volta che aggiungo un impiegato va aggioranta la tabella Storico, inserendo all'interno l'impiegato con 
-		ruolo_prec = NULL e nuovo_ruolo=junior (si presuppone nell'azienda già dipendenti senior)
-
-2	0.1 Creare una funzione di aggiornamento database che quando chiamata, mi aggiunge, se si verificano le condizioni,
-		i nuovi scatti di carriera fatti dagli impiegati, verifica che sulla tabella delle gestioni,
-		nel caso in cui i progetti sono stati finiti, allora elimino dalla tabella gestione (stessa funz 1.3)
-		aggiorna_database(); (quando la data è inserita nel momento di creazione della tupla)
-
-3	0.2 potremmo fare qualche vincolo di integrita semantica
-		(esempio un junior non puo avere lo stipendio piu alto di un senior)
-
-4	0.3 (delete)Nel momento in cui elimino un dirigente che è associato ad un progetto allora devo chiedere all'utente di sostituire
-		il responsabile di quel progetto altrimenti lanciando un messaggio di errore.
-		stessa cosa per referente per un progetto e un responsabile scientifico per quel progetto.
-		Questo giustificato dal fatto che un progetto non può esserci senza responsabile e referente,
-		e un laboratorio non può esserci senza un referente scientifico.
-
-	_________________________________________________________________________________________________________________
-
-
-	TRIGGER SUL PROGETTO:
-
-5	1.0 (delete pro) se elimino prog allora elimino l'associazione tra i laboratori e quel progetto.
-
-6	1.1 (insert prog) quando aggiungo un referente e un responsabile devo fare in modo tale 
-		che sia il primo senior e il secondo dirigente,
-		altrimenti mando un messaggio di errore e non faccio l'inserimento.
-
-7	1.15(update referente, matricola) se si aggiorna un responsabile o un referente allora si verifichi che il nuovo
-		valore sia assegnabile. 
-
-8	1.2(vincolo di gestione) Un progetto ha al più tre laboratori associati. (sulla tabella gestione).
-
-9	1.3(update data fine) nel caso in cui sul progetto viene inserito la data di fine (RISPETTO A OGGI), 
-		allora bisogna eliminare nella tabella (gestione)
-		tutti i laboratori associati.
-
-	_________________________________________________________________________________________________________________
-
-
-	TRIGGER SU LABORATORIO:
-
-
-10	2.05 quando aggiorno un responsabile scientifico, controllo se il nuovo valore è un senior, altrimenti rollback
-	
-11	2.1 quando aggiungo un responsabile scientifico esso dev'essere un senior, altrimenti elimina la tupla 
-		lanciando un messaggio di eccezione.
-
-12	2.2 controllare che un impiegato non lavora per più di otto ore al giorno (tabella afferenza), altrimenti
-		lanciare un messaggio di errore.
-	
-13	2.3 ogni volta che aggiungo o elimino un'afferenza impiegato-laboratorio allora aggiorno il numero di afferenti di quel
-		laboratorio.
-
-	_________________________________________________________________________________________________________________
-
-	TRIGGER SULLO STORICO:
-14	3.0 Quando modifico l'attributo booleano da (false -> true), allora lo scatto dev'essere registrato nella tabella
-		storico, in questo modo riesco a recuperare anche lo scatto dirigenziale fatto.
-
-15	3.1 Nel caso in cui l'attributo booleano passa (true->false) devo prima controllare che il dirigente non abbia
-		in gestione un progetto,
-	_________________________________________________________________________________________________________________
-*/
-
-
---tieni traccia dello scatto di carriera dirigente e la sua data_inizio e data_fine

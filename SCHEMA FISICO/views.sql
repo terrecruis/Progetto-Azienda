@@ -9,13 +9,13 @@
 
 	SCHEMA LOGICO DEL PROGETTO:
 
-	IMPIEGATO(matricola, nome, cognome, cf, curriculum, stipendio, sesso, foto, tipo, dirigente, data_licenziamento)
+	IMPIEGATO(matricola, nome, cognome, cf, curriculum, stipendio, sesso, foto, tipo, dirigente, data_licenziamento, data_assunzione)
 	LABORATORIO(id_lab, topic, indirizzo, numero_telefono, numero_afferenti, responsabile)
 	PROGETTO(CUP, nome_progetto, budget, data_inizio, data_fine,responsabile,referente)
 	STORICO(ruolo_prec, nuovo_ruolo, data_scatto, matricola)
 	AFFERENZA(matricola, id_lab, ore_giornaliere, tipo_contratto)
 	GESTIONE(cup, id_lab)
-	
+    
 */
 
 --_____________________________________________________________________________________________--
@@ -65,6 +65,17 @@ CREATE or replace VIEW Stipendio_medio_laboratorio AS (
     from (impiegato as imp natural join afferenza as a)
           natural join laboratorio as l
     group by l.id_lab
+);
+
+--_____________________________________________________________________________________________--
+
+/*
+    VIEW CHE MI MOSTRA I DIRIGENTI[...]
+*/
+CREATE OR REPLACE VIEW Dirigenti_Attuali AS (
+    select *
+    from Impiegati_attuali
+    where dirigente is true
 );
 
 --_____________________________________________________________________________________________--

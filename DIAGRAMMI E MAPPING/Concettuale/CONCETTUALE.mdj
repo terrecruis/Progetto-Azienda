@@ -1325,7 +1325,7 @@
 											"top": 283,
 											"width": 159,
 											"height": 13,
-											"text": "+StartDate: date",
+											"text": "+DataInizio: date",
 											"horizontalAlignment": 0
 										},
 										{
@@ -1342,7 +1342,7 @@
 											"top": 298,
 											"width": 159,
 											"height": 13,
-											"text": "+Deadline: date",
+											"text": "+DataFine: date",
 											"horizontalAlignment": 0
 										}
 									],
@@ -2541,7 +2541,7 @@
 									"hostEdge": {
 										"$ref": "AAAAAAGGxpK96LsjeSM="
 									},
-									"text": "+1...*"
+									"text": "+0...*"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -3093,7 +3093,7 @@
 									"hostEdge": {
 										"$ref": "AAAAAAGGxpVA7QT3hiw="
 									},
-									"text": "+1..*"
+									"text": "+0..*"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -3369,7 +3369,7 @@
 									"hostEdge": {
 										"$ref": "AAAAAAGGxs1JR6O87LU="
 									},
-									"text": "+1...*"
+									"text": "+0...*"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -4134,7 +4134,7 @@
 								"_parent": {
 									"$ref": "AAAAAAGGxpK957sfedw="
 								},
-								"name": "1...*",
+								"name": "0...*",
 								"reference": {
 									"$ref": "AAAAAAGGxolUflMdOo8="
 								}
@@ -4356,7 +4356,7 @@
 								"_parent": {
 									"$ref": "AAAAAAGGxpVA7ATzTWY="
 								},
-								"name": "1..*",
+								"name": "0..*",
 								"reference": {
 									"$ref": "AAAAAAGGxol8rFNHOao="
 								}
@@ -4492,7 +4492,7 @@
 							"_parent": {
 								"$ref": "AAAAAAGGxol8rFNHOao="
 							},
-							"name": "StartDate",
+							"name": "DataInizio",
 							"type": "date"
 						},
 						{
@@ -4501,7 +4501,7 @@
 							"_parent": {
 								"$ref": "AAAAAAGGxol8rFNHOao="
 							},
-							"name": "Deadline",
+							"name": "DataFine",
 							"type": "date"
 						}
 					]
@@ -4538,7 +4538,7 @@
 								"_parent": {
 									"$ref": "AAAAAAGGxs1JRqO4KX0="
 								},
-								"name": "1...*",
+								"name": "0...*",
 								"reference": {
 									"$ref": "AAAAAAGGxol8rFNHOao="
 								}

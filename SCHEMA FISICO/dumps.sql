@@ -1,5 +1,5 @@
 /*
-    DUMPS
+    DUMPS __da aggiornare con i nuovi attributi inseriti[...]
 */
 
 --INSERIMENTO NELLA TABELLA IMPIEGATO
@@ -27,6 +27,7 @@ VALUES
 ('MAT-020', 'Chiara', 'Conti', 'CNTCHR80L12G123T', 'Master in Lingue Straniere per il Turismo', 2600.00, 'F', 'middle', false);
 ('MAT-021', 'francesco', 'salvatore', 'CNTCHR80L12G121T', 'Master in Psicologia', 2600.00, 'M', 'junior', false);
 ('MAT-022', 'Simone', 'Esposito', 'CNTCwR80L12G121T', 'Master in Psicologia', 2600.00, 'M', 'senior', false);
+('MAT-023', 'Gianmarco', 'Deiana', 'CNTCQR80L12G121T', 'Master in Matematica', 2600.00, 'M', 'senior', false);
 
 --INSERIMENTO NELLA TABELLA STORICO
 INSERT INTO STORICO (ruolo_prec, nuovo_ruolo, data_scatto, matricola) VALUES
