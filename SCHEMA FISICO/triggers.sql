@@ -45,26 +45,20 @@ OK	0.3 (delete)Nel momento in cui elimino un dirigente che è associato ad un pr
     _________________________________________________________________________________________________________________________________
     	TRIGGER SUL PROGETTO:
 
-	1.0 (delete pro) se elimino prog allora elimino l'associazione tra i laboratori e quel progetto.
-
-	1.1 (insert prog) quando aggiungo un referente e un responsabile devo fare in modo tale 
+OK	1.0 (insert prog) quando aggiungo un referente e un responsabile devo fare in modo tale 
 		che sia il primo senior e il secondo dirigente,
 		altrimenti mando un messaggio di errore e non faccio l'inserimento.
 
-	1.15(update referente, matricola) se si aggiorna un responsabile o un referente allora si verifichi che il nuovo
+OK	1.1(update referente, matricola) se si aggiorna un responsabile o un referente allora si verifichi che il nuovo
 		valore sia assegnabile. 
 
-	1.2(vincolo di gestione) Un progetto ATTIVI (data fine = null) ha al più 
+ok	1.2(vincolo di gestione) Un progetto ATTIVI (data fine = null) ha al più 
 		tre laboratori associati. (sulla tabella gestione).
-
-	1.3(update data fine) nel caso in cui sul progetto viene inserito la data di fine (RISPETTO A OGGI), 
-		allora bisogna eliminare nella tabella (gestione)
-		tutti i laboratori associati.
 
 	_________________________________________________________________________________________________________________
 
 	TRIGGER SU LABORATORIO:
-
+	2.0 verifica che un responsabile scientifico sia unico e senior per ogni laboratorio diverso.
 
 	2.05 quando aggiorno un responsabile scientifico, controllo se il nuovo valore è un senior, altrimenti rollback
 	
@@ -78,15 +72,8 @@ OK	0.3 (delete)Nel momento in cui elimino un dirigente che è associato ad un pr
 		laboratorio.
 
 	_________________________________________________________________________________________________________________
-
-	TRIGGER SULLO STORICO:
-	3.0 Quando modifico l'attributo booleano da (false -> true), allora lo scatto dev'essere registrato nella tabella
-		storico, in questo modo riesco a recuperare anche lo scatto dirigenziale fatto.
-
-	3.1 Nel caso in cui l'attributo booleano passa (true->false) devo prima controllare che il dirigente non abbia
-		in gestione un progetto,
-	_________________________________________________________________________________________________________________
 */
+
 
 
 
@@ -318,4 +305,165 @@ AFTER UPDATE OF dirigente On impiegato
 FOR EACH ROW
 EXECUTE FUNCTION f_update_dirigente();
 
+--________________________________________________________________________________________________________________________________--
+
+/*
+	VINCOLO DI INTEGRITA' SEMANTICA[...] :
+	Un impiegato Junior o un middle non può avere lo stipendio più alto di un senior.
+	--aggiorna per il middle rispetto al junior...--
+*/
+create or replace function f_check_stipendio() returns TRIGGER AS 
+$$
+	BEGIN
+		IF EXISTS(SELECT*
+				  FROM Impiegato as i
+				  where i.tipo_impiegato = 'Senior' and i.stipendio < new.stipendio ) then
+
+			RAISE EXCEPTION 'Un dipendente di grado inferiore non può avere uno stipendio più alto di un senior';
+		END IF;
+
+		RETURN NEW;
+	END;
+$$
+
+
+create or replace trigger check_stipendio()
+after insert or update on Impiegato
+when tipo_impiegato = 'junior' or tipo_impiegato = 'middle'
+for each ROW
+execute function f_check_stipendio();
+
+--________________________________________________________________________________________________________________________________--
+--________________________________________________________________________________________________________________________________--
+
+--												TRIGGER E FUNZIONI SU PROGETTO:
+
+/*
+	TRIGGER :
+	1.0 (insert prog) quando aggiungo un referente e un responsabile devo fare in modo tale 
+		che sia il primo senior e il secondo dirigente,
+		altrimenti mando un messaggio di errore e non faccio l'inserimento.
+*/
+
+create or replace function f_check_referente_or_dirigente() returns trigger AS
+$$
+	BEGIN
+		IF(new.dirigente not in (select matricola from impiegato where dirigente is true)) then 
+			RAISE EXCEPTION 'Il responsabile deve essere un dirigente dell azienda!';
+		
+		IF(new.referente not in (select matricola from impiegato where tipo_impiegato = 'Senior'))
+			RAISE EXCEPTION 'Il referente deve essere un impiegato Senior!';
+
+	RETURN NEW;
+
+	END;
+$$
+
+
+CREATE OR REPLACE TRIGGER check_referente_or_dirigente
+AFTER INSERT ON PROGETTO
+FOR EACH ROW
+EXECUTE FUNCTION f_check_referente_or_dirigente();
+
+--________________________________________________________________________________________________________________________________--
+/*
+		TRIGGER 1.1
+		se si aggiorna un responsabile o un referente allora si verifichi che il nuovo valore sia assegnabile. 
+*/
+
+CREATE OR REPLACE TRIGGER check_update_dirigente_or_responsabile
+AFTER UPDATE of referente or responsabile ON PROGETTO 
+FOR EACH ROW
+EXECUTE FUNCTION f_check_referente_or_dirigente();
+
+--________________________________________________________________________________________________________________________________--
+
+/*
+		1.2(vincolo di gestione) Un progetto ATTIVI (data fine = null) ha al più 
+		tre laboratori associati. (sulla tabella gestione).
+*/
+
+CREATE OR REPLACE FUNCTION f_max_labs_per_cup() RETURNS TRIGGER AS 
+$$
+DECLARE
+    lab_count INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO lab_count FROM Gestione_Attuale WHERE cup = NEW.cup;
+    IF lab_count >= 3 THEN
+        RAISE EXCEPTION 'Non è possibile associare più di tre ID_LAB ad un  CUP';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER max_labs_per_cup
+BEFORE INSERT ON GESTIONE
+FOR EACH ROW
+EXECUTE FUNCTION f_max_labs_per_cup();
+
+--________________________________________________________________________________________________________________________________--
+--________________________________________________________________________________________________________________________________--
+
+--														TRIGGER SU LABORATORIO:
+
+/*
+	TRIGGER 2.0 and 2.05 : RESPONSABILE SCIENTIFICO 
+	verifica che quando inserisco un laboratorio, il suo responsabile scientifico sia senior e responsabile solo di QUEL laboratorio.
+*/
+CREATE OR REPLACE FUNCTION f_check_responsabile_scientifico() RETURNS TRIGGER AS 
+$$
+BEGIN	
+	IF NEW.r_scientifico NOT IN (SELECT matricola FROM impiegato WHERE tipo_impiegato = 'senior') THEN
+		RAISE EXCEPTION 'Il referente scientifico deve essere un senior dell''azienda!';
+	END IF;
+
+	IF EXISTS (SELECT * FROM laboratorio WHERE r_scientifico = NEW.r_scientifico AND id_lab <> NEW.id_lab) THEN
+		RAISE EXCEPTION 'Il referente scientifico è già associato ad un altro laboratorio!';
+	END IF;
+
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_responsabile_scientifico_insert
+AFTER INSERT ON laboratorio
+FOR EACH ROW
+EXECUTE FUNCTION f_check_responsabile_scientifico();
+
+CREATE TRIGGER check_responsabile_scientifico_update
+AFTER UPDATE OF r_scientifico ON laboratorio
+FOR EACH ROW
+EXECUTE FUNCTION f_check_responsabile_scientifico();
+
+--________________________________________________________________________________________________________________________________--
+/*
+	TRIGGER 2.2 
+	controllare che un impiegato non lavora per più di otto ore al giorno (tabella afferenza), altrimenti
+	lanciare un messaggio di errore.
+*/
+CREATE OR REPLACE FUNCTION f_max_ore_giornaliere() RETURNS TRIGGER AS 
+$$
+	DECLARE
+	num_ore_tot INTEGER;
+	BEGIN
+		num_ore_tot := (select sum(ore_giornaliere) from afferenza as a where a.matricola = new.matricola)
+
+		if num_ore_tot > 8
+			RAISE EXCEPTION 'UN IMPIEGATO NON PUO LAVORARE PIU DI OTTO ORE AL GIORNO!';
+		END IF;
+
+	END;
+
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER max_ore_giornaliere
+AFTER INSERT ON AFFERENZA
+FOR EACH ROW
+EXECUTE FUNCTION f_max_ore_giornaliere();
+
+CREATE OR REPLACE TRIGGER max_ore_giornaliere
+AFTER UPDATE OF ore_giornaliere ON AFFERENZA
+FOR EACH ROW
+EXECUTE FUNCTION f_max_ore_giornaliere();
 --________________________________________________________________________________________________________________________________--
