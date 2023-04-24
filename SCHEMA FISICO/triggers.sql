@@ -94,7 +94,7 @@
 --________________________________________________________________________________________________________________________________--
 
 /*
-    --TRIGGER 0.0 :
+    --TRIGGER 0.0 : INSERIMENTO DI UN IMPIEGATO, CONTROLLO VALIDITA' DI DATA E NEL CASO POSITIVO AGGIUNGO NELLO STORICO.
 
     NEL MOMENTO IN CUI INSERISCO UN NUOVO IMPIEGATO, AGGIORNO IL SUO STATUS
     ALL'INTERNO DELLO STORICO CON LA DATA DI SCATTO CON IL TIPO INSERITO,
@@ -102,92 +102,47 @@
     CALCOLANDOLI GRAZIE ALLA DATA DI ASSUNZIONE.
 */
 
+--si implementi un trigger che all inserimento di un impiegato si occupi di inserire i suoi scatti di carriera nella tab storico
+CREATE OR REPLACE TRIGGER insert_storico
+AFTER INSERT ON impiegato
+FOR EACH ROW
+EXECUTE FUNCTION function_insert_storico();
 
-CREATE OR REPLACE FUNCTION update_storico_impiegato() RETURNS trigger AS
-$update_storico$
-BEGIN
-    --inserisco all'interno dello storico la nuova tupla creata
-        INSERT INTO STORICO (ruolo_prec, nuovo_ruolo, data_scatto, matricola)
-        VALUES (NULL, NEW.tipo_impiegato, CURRENT_DATE, NEW.matricola);
-
-        --allora aggiorno i vari scatti di carriera fatti.
-        if(NEW.tipo_impiegato <> 'junior') then
-            CALL update_scatti(new.tipo_impiegato,new.matricola);
-        end if;
-
-    RETURN NEW;
-END;
-$update_storico$ LANGUAGE plpgsql;
-
-
-CREATE OR REPLACE TRIGGER update_storico
-    AFTER INSERT ON IMPIEGATO
-    FOR EACH ROW
-    EXECUTE FUNCTION update_storico_impiegato();
-
-
-CREATE OR REPLACE PROCEDURE update_scatti(tipo_impiegato IN DOMINIO_IMPIEGATO, matricola IN VARCHAR(100)) AS
+CREATE OR REPLACE FUNCTION function_insert_storico() RETURNS TRIGGER AS
 $$
-    DECLARE
-
-        data_assunzione date;
-        data_prevista_middle date;
-
     BEGIN
-        data_assunzione := (SELECT data_assunzione FROM Impiegati_attuali AS I WHERE I.matricola = $2);
-        SELECT data_assunzione + INTERVAL '3 years' INTO data_prevista_middle;
+        -- Check if the hiring date is consistent with the role to allow insertion
+        IF (NEW.tipo_impiegato = 'junior') THEN
+            IF((NEW.data_assunzione + INTERVAL '3 years') >= CURRENT_DATE ) THEN  
+                INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
+            ELSE
+                -- Error message
+                RAISE EXCEPTION 'Invalid hiring date for a junior employee';
+            END IF;
 
-        --caso in cui viene aggiunto un dipendente già senior, dunque bisogna aggiornare vari scatti di carriera.
-        IF tipo_impiegato = 'senior' THEN
-            --allora aggiungo i due scatti di carriera rimanenti...
-            INSERT INTO STORICO (ruolo_prec, nuovo_ruolo, data_scatto, matricola)
-            VALUES (NULL, 'junior', data_assunzione, $2);
-            INSERT INTO STORICO (ruolo_prec, nuovo_ruolo, data_scatto, matricola)
-            VALUES ('junior', 'middle', data_prevista_middle, $2);
-        ELSIF tipo_impiegato = 'middle' THEN
-            INSERT INTO STORICO (ruolo_prec, nuovo_ruolo, data_scatto, matricola)
-            VALUES (NULL, 'junior', data_assunzione, $2);
+        ELSIF (NEW.tipo_impiegato = 'middle') THEN
+            IF ((NEW.data_assunzione + INTERVAL '3 years') <= CURRENT_DATE AND
+                NEW.data_assunzione + INTERVAL '7 years' >= CURRENT_DATE ) THEN 
+                    INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
+                    INSERT INTO storico VALUES ('junior', 'middle', NEW.data_assunzione + INTERVAL '3 years', NEW.matricola);
+            ELSE
+                -- Error message
+                RAISE EXCEPTION 'Invalid hiring date for a middle employee';
+            END IF;
+
+        ELSIF (NEW.tipo_impiegato = 'senior') THEN
+            IF((NEW.data_assunzione + INTERVAL '7 years') <= CURRENT_DATE ) THEN
+                INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
+                INSERT INTO storico VALUES ('junior', 'middle', NEW.data_assunzione + INTERVAL '3 years', NEW.matricola);
+                INSERT INTO storico VALUES ('middle', 'senior', NEW.data_assunzione + INTERVAL '7 years', NEW.matricola);
+            ELSE 
+                -- Error message
+                RAISE EXCEPTION 'Invalid hiring date for a senior employee';
+            END IF;
+
         END IF;
+        RETURN NEW;
     END;
 $$ LANGUAGE plpgsql;
 
 --________________________________________________________________________________________________________________________________--
-
---FUNZIONE DI AGGIORNAMENTO DEL DATABASE[...] 0.1
-/*
-    la funzione aggiorna il database seguendo due linee principali...
-    1) verifica se rispetto all'ultima data scatto di un impiegato_attuale vi debbano essere
-       ulteriori scatti, nel caso in cui vi fossero vengono aggiunti allo storico e aggiorna il 
-       tipo_impiegato (attributo dentro impiegato), in caso contrario 
-       non fa niente,
-       Algoritmicamente non fa altro che scorrere la lista di impiegati attuali e verifica inanzitutto il tipo,
-       se esso è junior va a controllare la data in cui lo è diventato, e verifica con la data odierna :
-       Se essa rispetto alla data_scatto sono passati tre anni ma meno di 7 avviene lo scatto a middle,
-       se sono passati più di sette anni avvengono due scatti :
-       datajunior+3 = scattomiddle
-       dataMiddle+4 = dataSenior;
-
-       Nel caso in cui l'impiegato in questione è invece un middle si verifica che la data scatto
-       sia ancora nel range rispetto alla data odierna, in caso contrario (sono passati 4 anni), allora diventa
-       senior. 
-
-       Nel caso in cui esso è Senior non fa nulla
-*/
-
-CREATE OR REPLACE PROCEDURE update_database() AS
-$$
-    DECLARE
-        --cursore di impiegati 
-        cursore_impiegati cursor for=(select*
-                            from impiegati
-                            where data_licenziamento is null);
-    BEGIN
-        
-
-    END;
-$$ LANGUAGE plpgsql;
-
-
-/*
-
-*/
