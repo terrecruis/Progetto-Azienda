@@ -159,23 +159,28 @@ CREATE OR REPLACE PROCEDURE update_database() AS
 $$
 	DECLARE
 		--cursore con tutti gli impiegati con le ultime date scatto fatte
-		cursore_impiegati cursor for(select*
-									 from impiegato as i natural join storico as s 
+		cursore_impiegati cursor is (select*
+									 from impiegato as i natural join storico as s
 									 where s.nuovo_ruolo = i.tipo_impiegato);
-		
+
 		imp_corrente record;
 
 	BEGIN
 
 		--AGGIORNAMENTO IMPIEGATI[...]
-		for cursore_impiegati INTO imp_corrente loop
+		open cursore_impiegati;
+		LOOP
+		FETCH cursore_impiegati INTO imp_corrente;
+		IF NOT FOUND THEN
+            EXIT;
+        end if;
 
 			--CASO IN CUI E' JUNIOR
 			IF(imp_corrente.tipo_impiegato = 'junior') THEN
 					--se sono passati piu di tre anni allora discrimino gli scatti di carriera fatti.
 				IF(imp_corrente.data_assunzione + INTERVAL '3 years' <= CURRENT_DATE) THEN
 
-					IF(imp_corrente.data_assunzione + INTERVAL '7 YEEARS' >= CURRENT_DATE) THEN
+					IF(imp_corrente.data_assunzione + INTERVAL '7 years' >= CURRENT_DATE) THEN
 						INSERT INTO STORICO VALUES('junior','middle',imp_corrente.data_assunzione + INTERVAL '3 YEARS', imp_corrente.matricola);
 
 						UPDATE IMPIEGATO
@@ -204,7 +209,8 @@ $$
 					WHERE impiegato.matricola = imp_corrente.matricola;
 				end if;
 			END IF;
-		END LOOP:
+		END LOOP;
+		close cursore_impiegati;
 
 	END;
 
