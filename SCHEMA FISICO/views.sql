@@ -24,6 +24,7 @@
     la tabella impiegati tiene traccia sia degli impiegati attuali sia di quelli licenziati,
     motivo per il quale mi salvo in una view a parte tutti gli impiegati attuali dell'azienda.
 */
+
 CREATE VIEW Impiegati_attuali AS
 select*
 from Impiegato
@@ -42,16 +43,12 @@ SELECT i.nome, i.cognome, i.matricola,
        s1.data_scatto AS data_scatto_junior,
        s2.data_scatto AS data_scatto_middle,
        s3.data_scatto AS data_scatto_senior,
-       s4.data_scatto AS data_scatto_dirigenza,
-       s5.data_scatto AS data_fine_dirigenza,
        i.dirigente
 FROM IMPIEGATO i
 --uguale matricola ma con storici diversi e scatti diversi.
 LEFT JOIN STORICO s1 ON i.matricola = s1.matricola AND s1.nuovo_ruolo = 'junior'
 LEFT JOIN STORICO s2 ON i.matricola = s2.matricola AND s2.nuovo_ruolo = 'middle'
 LEFT JOIN STORICO s3 ON i.matricola = s3.matricola AND s3.nuovo_ruolo = 'senior'
-LEFT JOIN STORICO s4 ON i.matricola = s4.matricola AND s4.nuovo_ruolo = 'Dirigente'
-LEFT JOIN STORICO s5 ON i.matricola = s5.matricola AND s5.nuovo_ruolo = 'NonDirigente'
 );
 
  --_____________________________________________________________________________________________--
@@ -75,7 +72,7 @@ CREATE or replace VIEW Stipendio_medio_laboratorio AS (
 CREATE OR REPLACE VIEW Dirigenti_Attuali AS (
     select *
     from Impiegati_attuali
-    where dirigente is true
+    where dirigente is true 
 );
 
 --_____________________________________________________________________________________________--

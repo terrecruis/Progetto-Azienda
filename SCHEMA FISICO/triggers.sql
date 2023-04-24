@@ -171,8 +171,7 @@ $$ LANGUAGE plpgsql;
        sia ancora nel range rispetto alla data odierna, in caso contrario (sono passati 4 anni), allora diventa
        senior. 
 
-       Nel caso in cui esso è Senior non fa nulla.
-
+       Nel caso in cui esso è Senior non fa nulla
 */
 
 CREATE OR REPLACE PROCEDURE update_database() AS

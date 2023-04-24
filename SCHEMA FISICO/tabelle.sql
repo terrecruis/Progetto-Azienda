@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS PROGETTO
 	data_fine DATE DEFAULT NULL,  --poichè data_fine non è immediatamente decisa al momento della creazione--
 	responsabile varchar NOT NULL, --perchè il responsabile si conosce a priori
 	referente varchar not null,   --perchè il referente si conosce a priori
-	CONSTRAINT data_fine_corrente CHECK(data_fine<data_inizio),
+	CONSTRAINT data_fine_corrente CHECK(data_fine>data_inizio),
 	CONSTRAINT budget_corretto CHECK(budget > 0),
 	CONSTRAINT cup_pk PRIMARY KEY(cup),
 
