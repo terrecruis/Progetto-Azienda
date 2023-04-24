@@ -1,5 +1,20 @@
 /*
 	Questa parte è inerente al DDL : Data Definition Language 
+	L’azienda possiede un certo numero di impiegati, raggruppabili in 4 categorie:
+	1- Dipendente junior: colui che lavora da meno di 3 anni all’interno dell’azienda;
+	2- Dipendente middle: colui che lavora da meno di 7 ma da più di tre anni per l’azienda;
+	3- Dipendente senior: colui che lavora da almeno 7 anni per l’azienda.
+	4- Dirigenti: la classe dirigente non ha obblighi temporali di servizio. Chiunque può diventare dirigente,
+	se mostra di averne le capacità.
+	I passaggi di ruolo avvengono per anzianità di servizio. 
+	È necessario tracciare tutti gli scatti di carriera per ogni dipendente.
+	Nell’azienda vengono gestiti laboratori e progetti. 
+	Un laboratorio ha una particolare topic di cui si occupa, 
+	un certo numero di afferenti ed un responsabile scientifico che è un dipendente senior. 
+	Un progetto è identificato da un CUP (codice unico progetto) e da un nome (unico nel sistema). 
+	Ogni progetto ha un referente scientifico, il quale deve essere un dipendente senior dell’ente, 
+	ed un responsabile che è uno dei dirigenti. Al massimo 3 laboratori possono lavorare ad un progetto.
+
 */
 
 
@@ -17,7 +32,7 @@
 
 
 --questo vincolo mi assicura il tipo di impiegato attuale.
-CREATE DOMAIN DOMINIO_IMPIEGATO AS VARCHAR CHECK(VALUE IN('junior','middle','senior',));
+CREATE DOMAIN DOMINIO_IMPIEGATO AS VARCHAR CHECK(VALUE IN('junior','middle','senior'));
 CREATE DOMAIN DOMINIO_CONTRATTO AS VARCHAR CHECK(VALUE IN('determinato','indeterminato'));
 --questo dominio mi assicura il tipo di impiegato al momento dello scatto di carriera
 CREATE DOMAIN DOMINIO_SCATTO AS VARCHAR CHECK(VALUE IN('junior','middle','senior','dirigente','NonDirigente'));
@@ -34,10 +49,10 @@ CREATE TABLE IF NOT EXISTS IMPIEGATO
 	foto BYTEA,
 	tipo_impiegato DOMINIO_IMPIEGATO NOT NULL DEFAULT 'junior',
 	dirigente BOOLEAN NOT NULL DEFAULT FALSE,
-	data_assunzione date not null;
+	data_assunzione date not null,
 	data_licenziamento date DEFAULT null,
 
-	CONSTRAINT data_corretta CHECK(data_assunzione < data_licenziamento);
+	CONSTRAINT data_corretta CHECK(data_assunzione < data_licenziamento),
 	CONSTRAINT impiegato_pk PRIMARY KEY(matricola),
 	CONSTRAINT stipendio_corretto CHECK(stipendio > 0),
 	CONSTRAINT sesso_corretto CHECK(sesso = 'M' OR sesso = 'F')
@@ -89,15 +104,11 @@ CREATE TABLE IF NOT EXISTS STORICO
 
 	CONSTRAINT storico_pk PRIMARY KEY(nuovo_ruolo, matricola),
 	CONSTRAINT matricola_fk FOREIGN KEY(matricola) REFERENCES IMPIEGATO(matricola),
-	--i primi tre casi sono quando inserisco un impiegato già senior o middle, o junior.
-	CONSTRAINT check_ruolo CHECK(((ruolo_prec is NULL) AND (nuovo_ruolo = 'junior')) 
-								 ((ruolo_prec is NULL) AND (nuovo_ruolo = 'middle'))  
-								 ((ruolo_prec is NULL) AND (nuovo_ruolo = 'senior'))
-								 or --oppure controllo il corretto flusso di scatti possibili.
-								  ((ruolo_prec = 'junior') AND (nuovo_ruolo = 'middle')) or
-								  ((ruolo_prec = 'middle') AND (nuovo_ruolo = 'senior'))  or
-								  	(ruolo_prec = 'NonDirigente') AND (nuovo_ruolo = 'dirigente') or
-									(ruolo_prec = 'dirigente') AND (nuovo_ruolo = 'NonDirigente'));
+	CONSTRAINT check_ruolo CHECK(((ruolo_prec is NULL) AND (nuovo_ruolo = 'junior')) OR 
+								  ((ruolo_prec = 'junior') AND (nuovo_ruolo = 'middle')) OR
+								  ((ruolo_prec = 'middle') AND (nuovo_ruolo = 'senior'))  OR
+								  	(ruolo_prec = 'NonDirigente') AND (nuovo_ruolo = 'dirigente') OR
+									(ruolo_prec = 'dirigente') AND (nuovo_ruolo = 'NonDirigente'))
 );
 
 CREATE TABLE IF NOT EXISTS AFFERENZA

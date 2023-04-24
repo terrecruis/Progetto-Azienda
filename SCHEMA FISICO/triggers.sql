@@ -7,7 +7,7 @@
 	SCHEMA LOGICO:
 
 	IMPIEGATO(matricola, nome, cognome, cf, curriculum, stipendio, sesso, foto, tipo, dirigente, data_licenziamento)
-	LABORATORIO(id_lab, topic, indirizzo, numero_telefono, numero_afferenti, responsabile)
+	LABORATORIO(id_lab, topic, indirizzo, numero_telefono, numero_afferenti, r_scientifico)
 	PROGETTO(CUP, nome_progetto, budget, data_inizio, data_fine,responsabile,referente)
 	STORICO(ruolo_prec, nuovo_ruolo, data_scatto, matricola)
 	AFFERENZA(matricola, id_lab, ore_giornaliere, tipo_contratto)
@@ -15,12 +15,20 @@
 */
 
 
+
+
+
+/*
+	TRIGGER:
+	UN LABORATORIO LAVORA AL MASSIMO AD UN PROGETTO
+*/
+
 /*______________________________________________________________________________________________________________________________
     TRIGGER SU IMPIEGATO:
 
 	(parte sullo storico e aggiornamento del database)
 
-OK	0.0 Ogni volta che aggiungo un impiegato va aggioranta la tabella Storico, inserendo all'interno l'impiegato con 
+OK	0.0 Ogni volta che aggiungo un impiegato va aggioranta la tabella Storico, inserendo all'interno l'impiegato con
 		ruolo_prec = NULL e nuovo_ruolo = new.tipo, nel caso in cui il tipo inserito sia >junior allora, inserisco
         all'interno dello storico il resto degli scatti di carriera rimanenti.
 
@@ -28,7 +36,7 @@ OK	0.1 Creare una funzione di aggiornamento database che quando chiamata, mi agg
 		i nuovi scatti di carriera fatti dagli impiegati e il loro attributo 'tipo_impiegato'
 		aggiorna_database(); (quando la data è inserita nel momento di creazione della tupla)
 
-	0.2 potremmo fare qualche vincolo di integrita semantica
+OK	0.2 potremmo fare qualche vincolo di integrita semantica
 		(esempio un junior non puo avere lo stipendio piu alto di un senior)
 
 OK	0.3 (delete)Nel momento in cui elimino un dirigente che è associato ad un progetto allora devo chiedere all'utente di sostituire
@@ -45,30 +53,30 @@ OK	0.3 (delete)Nel momento in cui elimino un dirigente che è associato ad un pr
     _________________________________________________________________________________________________________________________________
     	TRIGGER SUL PROGETTO:
 
-OK	1.0 (insert prog) quando aggiungo un referente e un responsabile devo fare in modo tale 
+OK	1.0 (insert prog) quando aggiungo un referente e un responsabile devo fare in modo tale
 		che sia il primo senior e il secondo dirigente,
 		altrimenti mando un messaggio di errore e non faccio l'inserimento.
 
 OK	1.1(update referente, matricola) se si aggiorna un responsabile o un referente allora si verifichi che il nuovo
-		valore sia assegnabile. 
+		valore sia assegnabile.
 
-ok	1.2(vincolo di gestione) Un progetto ATTIVI (data fine = null) ha al più 
+ok	1.2(vincolo di gestione) Un progetto ATTIVI (data fine = null) ha al più
 		tre laboratori associati. (sulla tabella gestione).
 
 	_________________________________________________________________________________________________________________
 
 	TRIGGER SU LABORATORIO:
-	2.0 verifica che un responsabile scientifico sia unico e senior per ogni laboratorio diverso.
+OK	2.0 verifica che un responsabile scientifico sia unico e senior per ogni laboratorio diverso.
 
-	2.05 quando aggiorno un responsabile scientifico, controllo se il nuovo valore è un senior, altrimenti rollback
-	
-	2.1 quando aggiungo un responsabile scientifico esso dev'essere un senior, altrimenti elimina la tupla 
+OK	2.05 quando aggiorno un responsabile scientifico, controllo se il nuovo valore è un senior, altrimenti rollback
+
+OK	2.1 quando aggiungo un responsabile scientifico esso dev'essere un senior, altrimenti elimina la tupla
 		lanciando un messaggio di eccezione.
 
-	2.2 controllare che un impiegato non lavora per più di otto ore al giorno (tabella afferenza), altrimenti
+OK	2.2 controllare che un impiegato non lavora per più di otto ore al giorno (tabella afferenza), altrimenti
 		lanciare un messaggio di errore.
-	
-	2.3 ogni volta che aggiungo o elimino un'afferenza impiegato-laboratorio allora aggiorno il numero di afferenti di quel
+
+OK	2.3 ogni volta che aggiungo o elimino un'afferenza impiegato-laboratorio allora aggiorno il numero di afferenti di quel
 		laboratorio.
 
 	_________________________________________________________________________________________________________________
@@ -96,7 +104,7 @@ $$
     BEGIN
         -- Check if the hiring date is consistent with the role to allow insertion
         IF (NEW.tipo_impiegato = 'junior') THEN
-            IF((NEW.data_assunzione + INTERVAL '3 years') >= CURRENT_DATE ) THEN  
+            IF((NEW.data_assunzione + INTERVAL '3 years') >= CURRENT_DATE ) THEN
                 INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
             ELSE
                 -- Error message
@@ -105,7 +113,7 @@ $$
 
         ELSIF (NEW.tipo_impiegato = 'middle') THEN
             IF ((NEW.data_assunzione + INTERVAL '3 years') <= CURRENT_DATE AND
-                NEW.data_assunzione + INTERVAL '7 years' >= CURRENT_DATE ) THEN 
+                NEW.data_assunzione + INTERVAL '7 years' >= CURRENT_DATE ) THEN
                     INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
                     INSERT INTO storico VALUES ('junior', 'middle', NEW.data_assunzione + INTERVAL '3 years', NEW.matricola);
             ELSE
@@ -118,7 +126,7 @@ $$
                 INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
                 INSERT INTO storico VALUES ('junior', 'middle', NEW.data_assunzione + INTERVAL '3 years', NEW.matricola);
                 INSERT INTO storico VALUES ('middle', 'senior', NEW.data_assunzione + INTERVAL '7 years', NEW.matricola);
-            ELSE 
+            ELSE
                 -- Error message
                 RAISE EXCEPTION 'Invalid hiring date for a senior employee';
             END IF;
@@ -145,9 +153,9 @@ EXECUTE FUNCTION f_insert_storico();
 /*
 	PROCEDURE 0.1 : AGGIORNAMENTO DEL DATABASE
 
-	SI SCORRE TUTTI GLI IMPIEGATI PRENDENDO L'ULTIMO SCATTO DI CARRIERA FATTO E 
+	SI SCORRE TUTTI GLI IMPIEGATI PRENDENDO L'ULTIMO SCATTO DI CARRIERA FATTO E
 	CONTROLLA CON LA DATA ODIERNA. SE VI SONO ALTRI SCATTI ALLORA INSERISCE LE NUOVE TUPLE ALL'INTERNO
-	DI STORICO E VA A MODIFICARE IL TIPO DI IMPIEGATO (ATTRIBUTO IMPIEGATO), ALTRIMENTI NON FA NIENTE.	
+	DI STORICO E VA A MODIFICARE IL TIPO DI IMPIEGATO (ATTRIBUTO IMPIEGATO), ALTRIMENTI NON FA NIENTE.
 
 */
 
@@ -312,10 +320,10 @@ EXECUTE FUNCTION f_update_dirigente();
 	Un impiegato Junior o un middle non può avere lo stipendio più alto di un senior.
 	--aggiorna per il middle rispetto al junior...--
 */
-create or replace function f_check_stipendio() returns TRIGGER AS 
+create or replace function f_check_stipendio() returns TRIGGER AS
 $$
 	BEGIN
-		IF EXISTS(SELECT*
+		IF(new.tipo_impiegato = 'junior' or new. tipo_impiegato = 'middle') AND EXISTS(SELECT*
 				  FROM Impiegato as i
 				  where i.tipo_impiegato = 'Senior' and i.stipendio < new.stipendio ) then
 
@@ -324,12 +332,11 @@ $$
 
 		RETURN NEW;
 	END;
-$$
+$$ LANGUAGE plpgsql;
 
 
-create or replace trigger check_stipendio()
-after insert or update on Impiegato
-when tipo_impiegato = 'junior' or tipo_impiegato = 'middle'
+create or replace trigger check_stipendio
+after insert on Impiegato
 for each ROW
 execute function f_check_stipendio();
 
@@ -340,24 +347,25 @@ execute function f_check_stipendio();
 
 /*
 	TRIGGER :
-	1.0 (insert prog) quando aggiungo un referente e un responsabile devo fare in modo tale 
+	1.0 (insert prog) quando aggiungo un referente e un responsabile devo fare in modo tale
 		che sia il primo senior e il secondo dirigente,
 		altrimenti mando un messaggio di errore e non faccio l'inserimento.
 */
 
-create or replace function f_check_referente_or_dirigente() returns trigger AS
+careate or replace function f_check_referente_or_dirigente() returns trigger AS
 $$
 	BEGIN
-		IF(new.dirigente not in (select matricola from impiegato where dirigente is true)) then 
+		IF(new.responsabile not in (select matricola from impiegato where dirigente is true)) then
 			RAISE EXCEPTION 'Il responsabile deve essere un dirigente dell azienda!';
-		
-		IF(new.referente not in (select matricola from impiegato where tipo_impiegato = 'Senior'))
+        END IF;
+		IF(new.referente not in (select matricola from impiegato where tipo_impiegato = 'senior'))THEN
 			RAISE EXCEPTION 'Il referente deve essere un impiegato Senior!';
+		END IF;
 
 	RETURN NEW;
 
 	END;
-$$
+$$ language plpgsql;
 
 
 CREATE OR REPLACE TRIGGER check_referente_or_dirigente
@@ -368,22 +376,22 @@ EXECUTE FUNCTION f_check_referente_or_dirigente();
 --________________________________________________________________________________________________________________________________--
 /*
 		TRIGGER 1.1
-		se si aggiorna un responsabile o un referente allora si verifichi che il nuovo valore sia assegnabile. 
+		se si aggiorna un responsabile o un referente allora si verifichi che il nuovo valore sia assegnabile.
 */
 
 CREATE OR REPLACE TRIGGER check_update_dirigente_or_responsabile
-AFTER UPDATE of referente or responsabile ON PROGETTO 
+AFTER UPDATE of referente, responsabile ON PROGETTO
 FOR EACH ROW
 EXECUTE FUNCTION f_check_referente_or_dirigente();
 
 --________________________________________________________________________________________________________________________________--
 
 /*
-		1.2(vincolo di gestione) Un progetto ATTIVI (data fine = null) ha al più 
+		1.2(vincolo di gestione) Un progetto ATTIVI (data fine = null) ha al più
 		tre laboratori associati. (sulla tabella gestione).
 */
 
-CREATE OR REPLACE FUNCTION f_max_labs_per_cup() RETURNS TRIGGER AS 
+CREATE OR REPLACE FUNCTION f_max_labs_per_cup() RETURNS TRIGGER AS
 $$
 DECLARE
     lab_count INTEGER;
@@ -407,12 +415,12 @@ EXECUTE FUNCTION f_max_labs_per_cup();
 --														TRIGGER SU LABORATORIO:
 
 /*
-	TRIGGER 2.0 and 2.05 : RESPONSABILE SCIENTIFICO 
+	TRIGGER 2.0 and 2.05 : RESPONSABILE SCIENTIFICO
 	verifica che quando inserisco un laboratorio, il suo responsabile scientifico sia senior e responsabile solo di QUEL laboratorio.
 */
-CREATE OR REPLACE FUNCTION f_check_responsabile_scientifico() RETURNS TRIGGER AS 
+CREATE OR REPLACE FUNCTION f_check_responsabile_scientifico() RETURNS TRIGGER AS
 $$
-BEGIN	
+BEGIN
 	IF NEW.r_scientifico NOT IN (SELECT matricola FROM impiegato WHERE tipo_impiegato = 'senior') THEN
 		RAISE EXCEPTION 'Il referente scientifico deve essere un senior dell''azienda!';
 	END IF;
@@ -437,18 +445,18 @@ EXECUTE FUNCTION f_check_responsabile_scientifico();
 
 --________________________________________________________________________________________________________________________________--
 /*
-	TRIGGER 2.2 
+	TRIGGER 2.2
 	controllare che un impiegato non lavora per più di otto ore al giorno (tabella afferenza), altrimenti
 	lanciare un messaggio di errore.
 */
-CREATE OR REPLACE FUNCTION f_max_ore_giornaliere() RETURNS TRIGGER AS 
+CREATE OR REPLACE FUNCTION f_max_ore_giornaliere() RETURNS TRIGGER AS
 $$
 	DECLARE
 	num_ore_tot INTEGER;
 	BEGIN
-		num_ore_tot := (select sum(ore_giornaliere) from afferenza as a where a.matricola = new.matricola)
+		num_ore_tot := (select sum(ore_giornaliere) from afferenza as a where a.matricola = new.matricola);
 
-		if num_ore_tot > 8
+		IF (num_ore_tot > 8) THEN
 			RAISE EXCEPTION 'UN IMPIEGATO NON PUO LAVORARE PIU DI OTTO ORE AL GIORNO!';
 		END IF;
 
@@ -466,4 +474,42 @@ CREATE OR REPLACE TRIGGER max_ore_giornaliere
 AFTER UPDATE OF ore_giornaliere ON AFFERENZA
 FOR EACH ROW
 EXECUTE FUNCTION f_max_ore_giornaliere();
+--________________________________________________________________________________________________________________________________--
+/*
+	TRIGGER 2.3
+	ogni volta che aggiungo o elimino un'afferenza impiegato-laboratorio allora aggiorno il numero di afferenti di quel
+	laboratorio.
+*/
+CREATE OR REPLACE FUNCTION f_aggiorna_afferenti() RETURNS trigger AS
+$$
+	BEGIN
+		UPDATE laboratorio
+		SET numero_afferenti = numero_afferenti + 1
+		WHERE id_lab = new.id_lab;
+
+	END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION f_cancella_afferenti() RETURNS trigger AS
+$$
+	BEGIN
+		UPDATE laboratorio
+		SET numero_afferenti = numero_afferenti + 1
+		WHERE id_lab = new.id_lab;
+
+	END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER inserisci_afferenti
+AFTER INSERT ON AFFERENZA
+FOR EACH ROW
+EXECUTE FUNCTION f_aggiorna_afferenti();
+
+CREATE OR REPLACE TRIGGER cancella_afferenti
+AFTER DELETE ON AFFERENZA
+FOR EACH ROW
+EXECUTE FUNCTION f_cancella_afferenti();
+
+--________________________________________________________________________________________________________________________________--
+--________________________________________________________________________________________________________________________________--
 --________________________________________________________________________________________________________________________________--

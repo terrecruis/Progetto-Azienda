@@ -15,7 +15,7 @@
 	STORICO(ruolo_prec, nuovo_ruolo, data_scatto, matricola)
 	AFFERENZA(matricola, id_lab, ore_giornaliere, tipo_contratto)
 	GESTIONE(cup, id_lab)
-    
+
 */
 
 --_____________________________________________________________________________________________--
@@ -25,17 +25,17 @@
     motivo per il quale mi salvo in una view a parte tutti gli impiegati attuali dell'azienda.
 */
 
-CREATE VIEW Impiegati_attuali AS
+CREATE or replace VIEW Impiegati_attuali AS
 select*
 from Impiegato
-where data_licenziamento IS NULL
+where data_licenziamento IS NULL;
 
 --_____________________________________________________________________________________________--
 
 /*
     lo storico di un impiegato è formato dalla sua matricola,
     nome,cognome,datascattoJunior,datascattoMiddle, datascattoSenior e se è un dirigente.
-    Questa view mi restituisce lo storico di un impiegato      
+    Questa view mi restituisce lo storico di un impiegato
 */
 
 CREATE or replace VIEW STORICO_VIEW AS (
@@ -72,7 +72,7 @@ CREATE or replace VIEW Stipendio_medio_laboratorio AS (
 CREATE OR REPLACE VIEW Dirigenti_Attuali AS (
     select *
     from Impiegati_attuali
-    where dirigente is true 
+    where dirigente is true
 );
 
 --_____________________________________________________________________________________________--
@@ -84,7 +84,7 @@ CREATE OR REPLACE VIEW Dirigenti_Attuali AS (
 CREATE OR REPLACE VIEW Gestione_Attuale AS (
     select *
     from gestione as g natural join progetto as p
-    where p.data_fine is null or p.data_fine > CURRENT_DATE;
+    where p.data_fine is null or p.data_fine > CURRENT_DATE
 );
 
 --_____________________________________________________________________________________________--
