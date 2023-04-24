@@ -50,9 +50,9 @@ CREATE TABLE IF NOT EXISTS LABORATORIO
 	indirizzo VARCHAR NOT NULL,
 	numero_telefono VARCHAR,
 	numero_afferenti INTEGER DEFAULT 1,
-	responsabile VARCHAR NOT NULL,
+	r_scientifico VARCHAR NOT NULL,
 
-	CONSTRAINT responsabile_scientifico_fk FOREIGN KEY(responsabile) REFERENCES IMPIEGATO(matricola)
+	CONSTRAINT responsabile_scientifico_fk FOREIGN KEY(r_scientifico) REFERENCES IMPIEGATO(matricola)
 		ON UPDATE CASCADE,
 	CONSTRAINT id_lab_pk PRIMARY KEY(id_lab)
 );

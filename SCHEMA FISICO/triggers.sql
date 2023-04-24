@@ -147,7 +147,7 @@ $$ LANGUAGE plpgsql;
 --________________________________________________________________________________________________________________________________--
 
 /*
-	TRIGGER 0.1 : AGGIORNAMENTO DEL DATABASE
+	PROCEDURE 0.1 : AGGIORNAMENTO DEL DATABASE
 
 	SI SCORRE TUTTI GLI IMPIEGATI PRENDENDO L'ULTIMO SCATTO DI CARRIERA FATTO E 
 	CONTROLLA CON LA DATA ODIERNA. SE VI SONO ALTRI SCATTI ALLORA INSERISCE LE NUOVE TUPLE ALL'INTERNO
@@ -215,5 +215,52 @@ $$
 	END;
 
 $$ LANGUAGE plpgsql;
+
+--________________________________________________________________________________________________________________________________--
+
+/*
+	TRIGGER 0.3 :
+	Nel momento in cui elimino un dirigente che è associato ad un progetto allora devo chiedere all'utente di sostituire
+	il responsabile di quel progetto altrimenti lanciando un messaggio di errore.
+	stessa cosa per referente per un progetto
+	Questo giustificato dal fatto che un progetto non può esserci senza responsabile e referente.
+*/
+
+create or replace function procedure_eliminazione_impiegati_speciali() RETURNS TRIGGER AS
+$$
+	BEGIN
+
+		--if del responsabile di un progetto
+		IF EXISTS(select*
+				  from PROGETTO
+				  where responsabile = old.matricola and data_fine is null) THEN 
+
+		RAISE EXCEPTION 'Impossibile eliminare il responsabile di un progetto attivo, prima bisogna sostituirlo!';
+
+		--if del referente di un progetto
+		ELIF EXISTS(select*
+				  from PROGETTO
+				  where referente = old.matricola and data_fine is null) THEN 
+
+		RAISE EXCEPTION 'Impossibile eliminare il referente di un progetto attivo, prima bisogna sostituirlo!';
+
+		--if del responsabile scientifico in un laboratorio
+		ELIF EXISTS(select*
+				  from laboratorio
+				  where r_scientifico = old.matricola and data_fine is null) THEN 
+
+		RAISE EXCEPTION 'Impossibile eliminare di responsabile scientifico di un laboratorio , prima bisogna sostituirlo!';
+
+		ENDIF;
+
+		RETURN OLD;
+	END;
+$$
+
+CREATE OR REPLACE TRIGGER eliminazione_impiegati_speciali
+BEFORE DELETE ON IMPIEGATO
+FOR EACH ROW
+EXECUTE function procedure_eliminazione_impiegati_speciali();
+
 
 --________________________________________________________________________________________________________________________________--
