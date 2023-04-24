@@ -3,31 +3,28 @@
 */
 
 --INSERIMENTO NELLA TABELLA IMPIEGATO
-INSERT INTO IMPIEGATO(matricola, nome, cognome, cf, curriculum, stipendio, sesso, tipo_impiegato, dirigente,data_licenziamento)
+INSERT INTO IMPIEGATO (matricola, nome, cognome, cf, curriculum, stipendio, sesso, tipo_impiegato, dirigente, data_assunzione, data_licenziamento)
 VALUES
-('MAT-001', 'Mario', 'Rossi', 'RSSMRA85H12G123A', 'Laurea in Informatica', 3000.00, 'M', 'junior', false),
-('MAT-002', 'Luigi', 'Bianchi', 'BNCLGI83E11G123B', 'Dottorato in Fisica Teorica', 4500.00, 'M', 'senior', true),
-('MAT-003', 'Giovanni', 'Verdi', 'VRDGNN80L12G123C', 'Laurea in Economia', 2500.00, 'M', 'middle', false),
-('MAT-004', 'Roberta', 'Neri', 'NRIRBT81P12G123D', 'Specializzazione in Psicologia Clinica', 3500.00, 'F', 'senior', true),
-('MAT-005', 'Silvia', 'Ferrari', 'FRRSLV79E11G123E', 'Master in Marketing', 2800.00, 'F', 'middle', false),
-('MAT-006', 'Francesco', 'Russo', 'RSSFNC78H12G123F', 'Laurea in Ingegneria Meccanica', 3200.00, 'M', 'junior', false),
-('MAT-007', 'Chiara', 'Romano', 'RMNCHI77E11G123G', 'Dottorato in Biologia Molecolare', 4200.00, 'F', 'senior', true),
-('MAT-008', 'Alessio', 'Esposito', 'ESPLSS84T12G123H', 'Master in Scienze Politiche', 2900.00, 'M', 'middle', false),
-('MAT-009', 'Paolo', 'Colombo', 'CLBPLA82P12G123I', 'Laurea in Architettura', 2700.00, 'M', 'junior', false),
-('MAT-010', 'Federica', 'Conti', 'CNTFDR80L12G123J', 'Master in Lingue Straniere per il Turismo', 2600.00, 'F', 'middle', false),
-('MAT-011', 'Marco', 'Rossi', 'RSSMRC85H12G123K', 'Laurea in Informatica', 3000.00, 'M', 'junior', false),
-('MAT-012', 'Simone', 'Bianchi', 'BNCSMN83E11G123L', 'Dottorato in Fisica Teorica', 4500.00, 'M', 'senior', true),
-('MAT-013', 'Laura', 'Verdi', 'VRDLRA80L12G123M', 'Laurea in Economia', 2500.00, 'F', 'middle', false),
-('MAT-014', 'Maria', 'Neri', 'NRIMRA81P12G123N', 'Specializzazione in Psicologia Clinica', 3500.00, 'F', 'senior', true),
-('MAT-015', 'Enrico', 'Ferrari', 'FRRNRC79E11G123O', 'Master in Marketing', 2800.00, 'M', 'middle', false),
-('MAT-016', 'Giuseppe', 'Russo', 'RSSFPE78H12G123P', 'Laurea in Ingegneria Meccanica', 3200.00, 'M', 'junior', false),
-('MAT-017', 'Valentina', 'Romano', 'RMNVLN77E11G123Q', 'Dottorato in Biologia Molecolare', 4200.00, 'F', 'senior', true),
-('MAT-018', 'Fabio', 'Esposito', 'ESPFBO84T12G123R', 'Master in Scienze Politiche', 2900.00, 'M', 'middle', false),
-('MAT-019', 'Claudio', 'Colombo', 'CLBCLD82P12G123S', 'Laurea in Architettura', 2700.00, 'M', 'junior', false),
-('MAT-020', 'Chiara', 'Conti', 'CNTCHR80L12G123T', 'Master in Lingue Straniere per il Turismo', 2600.00, 'F', 'middle', false);
-('MAT-021', 'francesco', 'salvatore', 'CNTCHR80L12G121T', 'Master in Psicologia', 2600.00, 'M', 'junior', false);
-('MAT-022', 'Simone', 'Esposito', 'CNTCwR80L12G121T', 'Master in Psicologia', 2600.00, 'M', 'senior', false);
-('MAT-023', 'Gianmarco', 'Deiana', 'CNTCQR80L12G121T', 'Master in Matematica', 2600.00, 'M', 'senior', false);
+('MAT-001', 'Mario', 'Rossi', 'RSSMRA01A01H501A', 'Laurea in Informatica', 25000.00, 'M', 'junior', FALSE, '2022-01-01', null),
+('MAT-002', 'Luca', 'Bianchi', 'BNCLCU02B02H501B', 'Laurea in Ingegneria', 28000.00, 'M', 'junior', FALSE, '2022-02-01', null),
+('MAT-003', 'Giulia', 'Verdi', 'VRDGLI03C03H501C', 'Laurea in Economia', 30000.00, 'F', 'junior', FALSE, '2022-03-01', null),
+('MAT-004', 'Francesca', 'Neri', 'NRFNCS04D04H501D', 'Laurea in Giurisprudenza', 32000.00, 'F', 'junior', FALSE, '2022-04-01', null),
+('MAT-005', 'Antonio', 'Russo', 'RSSNTN05E05H501E', 'Laurea in Lingue', 29000.00, 'M', 'junior', FALSE, '2022-05-01', null),
+('MAT-006', 'Roberto', 'Ferrari', 'FRRRBR06F06H501F', 'Laurea in Architettura', 27000.00, 'M', 'junior', FALSE, '2022-06-01', null),
+('MAT-007', 'Simona', 'Romano', 'RMNSMN07G07H501G', 'Laurea in Psicologia', 31000.00, 'F', 'junior', FALSE, '2022-07-01', null),
+('MAT-008', 'Giovanni', 'Lombardi', 'LMBGNN08H08H501H', 'Laurea in Scienze Politiche', 29000.00, 'M', 'junior', FALSE, '2022-08-01', null),
+('MAT-009', 'Valentina', 'Greco', 'GRCVLN09I09H501I', 'Laurea in Lettere', 28000.00, 'F', 'junior', FALSE, '2022-09-01', null),
+('MAT-010', 'Alessandro', 'Moretti', 'MRTLSN10L10H501L', 'Laurea in Chimica', 32000.00, 'M', 'junior', FALSE, '2022-10-01', null),
+('MAT-011', 'Paolo', 'Conti', 'CNTPLA11M11H501M', 'Laurea in Biologia', 30000.00, 'M', 'junior', FALSE, '2022-11-01', null),
+('MAT-012', 'Elena', 'Esposito', 'ESPETN12N12H501N', 'Laurea in Filosofia', 29000.00, 'F', 'junior', FALSE, '2022-12-01', null),
+('MAT-013', 'Fabrizio', 'Ricci', 'RCCFBR13O13H501O', 'Laurea in Storia dell arte', 28000.00, 'M', 'junior', FALSE, '2023-01-01', null),
+('MAT-014', 'Silvia', 'Marino', 'MRNSLV14P14H501P', 'Laurea in Agraria', 31000.00, 'F', 'junior', FALSE, '2023-02-01', null),
+('MAT-015', 'Riccardo', 'Greco', 'GRCRCD15Q15H501Q', 'Laurea in Fisica', 32000.00, 'M', 'junior', FALSE, '2023-03-01', null),
+('MAT-016', 'Barbara', 'Lombardo', 'LMBBRB16R16H501R', 'Laurea in Scienze dell educazione', 29000.00, 'F', 'junior', FALSE, '2023-04-01', null),
+('MAT-017', 'Davide', 'Ferrara', 'FRRDVD17S17H501S', 'Laurea in Teologia', 28000.00, 'M', 'junior', FALSE, '2023-05-01', null),
+('MAT-018', 'Laura', 'Rizzo', 'RZZLRA18T18H501T', 'Laurea in Scienze motorie', 31000.00, 'F', 'junior', FALSE, '2023-06-01', null),
+('MAT-019', 'Marco', 'Bruno', 'BRNMRK19U19H501U', 'Laurea in Infermieristica', 30000.00, 'M', 'junior', FALSE, '2023-07-01', null),
+('MAT-020', 'Sara', 'Costa', 'CSTSR20V20H501V', 'Laurea in Odontoiatria', 32000.00, 'F', 'junior', FALSE, '2023-08-01', null);
 
 --INSERIMENTO NELLA TABELLA STORICO
 INSERT INTO STORICO (ruolo_prec, nuovo_ruolo, data_scatto, matricola) VALUES
