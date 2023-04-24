@@ -84,7 +84,7 @@ CREATE OR REPLACE VIEW Dirigenti_Attuali AS (
 CREATE OR REPLACE VIEW Gestione_Attuale AS (
     select *
     from gestione as g natural join progetto as p
-    where p.data_fine is null.
+    where p.data_fine is null
 );
 
 --_____________________________________________________________________________________________--

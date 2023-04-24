@@ -19,26 +19,27 @@
     TRIGGER SU IMPIEGATO:
 
 	(parte sullo storico e aggiornamento del database)
-	0.0 Ogni volta che aggiungo un impiegato va aggioranta la tabella Storico, inserendo all'interno l'impiegato con 
+
+OK	0.0 Ogni volta che aggiungo un impiegato va aggioranta la tabella Storico, inserendo all'interno l'impiegato con 
 		ruolo_prec = NULL e nuovo_ruolo = new.tipo, nel caso in cui il tipo inserito sia >junior allora, inserisco
         all'interno dello storico il resto degli scatti di carriera rimanenti.
 
-	0.1 Creare una funzione di aggiornamento database che quando chiamata, mi aggiunge, se si verificano le condizioni,
+OK	0.1 Creare una funzione di aggiornamento database che quando chiamata, mi aggiunge, se si verificano le condizioni,
 		i nuovi scatti di carriera fatti dagli impiegati e il loro attributo 'tipo_impiegato'
 		aggiorna_database(); (quando la data è inserita nel momento di creazione della tupla)
 
 	0.2 potremmo fare qualche vincolo di integrita semantica
 		(esempio un junior non puo avere lo stipendio piu alto di un senior)
 
-	0.3 (delete)Nel momento in cui elimino un dirigente che è associato ad un progetto allora devo chiedere all'utente di sostituire
+OK	0.3 (delete)Nel momento in cui elimino un dirigente che è associato ad un progetto allora devo chiedere all'utente di sostituire
 		il responsabile di quel progetto altrimenti lanciando un messaggio di errore.
 		stessa cosa per referente per un progetto e un responsabile scientifico per quel progetto.
 		Questo giustificato dal fatto che un progetto non può esserci senza responsabile e referente,
 		e un laboratorio non può esserci senza un referente scientifico.
 
-    0.4(update false->true)nel caso in cui viene aggiornato l'attributo booleano dirigente in Impiegato, allora
+ OK   0.4(update false->true)nel caso in cui viene aggiornato l'attributo booleano dirigente in Impiegato, allora
         bisogna inserire la data scatto all'interno dello storico.
-        (update true->false)nel caso in cui il dirigente gestisce qualche laboratorio mandare messaggio di errore, altrimenti,
+        (update true->false)nel caso in cui il dirigente gestisce qualche progetto mandare messaggio di errore, altrimenti,
         fare inserimento all'interno dello storico della data_scatto 'nonDirigente'->'dirigente'.
 
     _________________________________________________________________________________________________________________________________
@@ -102,12 +103,8 @@
 */
 
 --si implementi un trigger che all inserimento di un impiegato si occupi di inserire i suoi scatti di carriera nella tab storico
-CREATE OR REPLACE TRIGGER insert_storico
-AFTER INSERT ON impiegato
-FOR EACH ROW
-EXECUTE FUNCTION function_insert_storico();
 
-CREATE OR REPLACE FUNCTION function_insert_storico() RETURNS TRIGGER AS
+CREATE OR REPLACE FUNCTION f_insert_storico() RETURNS TRIGGER AS
 $$
     BEGIN
         -- Check if the hiring date is consistent with the role to allow insertion
@@ -139,10 +136,22 @@ $$
                 RAISE EXCEPTION 'Invalid hiring date for a senior employee';
             END IF;
 
+
+		--caso in cui l'impiegato è inserito come dirigente[...]
+		if(new.dirigente is true) THEN
+			INSERT INTO STORICO VALUES('NonDirigente','dirigente', CURRENT_DATE, new.matricola);
+		end if;
+
+
         END IF;
         RETURN NEW;
     END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER insert_storico
+AFTER INSERT ON impiegato
+FOR EACH ROW
+EXECUTE FUNCTION f_insert_storico();
 
 --________________________________________________________________________________________________________________________________--
 
@@ -226,41 +235,87 @@ $$ LANGUAGE plpgsql;
 	Questo giustificato dal fatto che un progetto non può esserci senza responsabile e referente.
 */
 
-create or replace function procedure_eliminazione_impiegati_speciali() RETURNS TRIGGER AS
+create or replace function f_eliminazione_impiegati_speciali() RETURNS TRIGGER AS
 $$
 	BEGIN
 
 		--if del responsabile di un progetto
 		IF EXISTS(select*
 				  from PROGETTO
-				  where responsabile = old.matricola and data_fine is null) THEN 
+				  where responsabile = old.matricola and data_fine is null or data_fine > CURRENT_DATE) THEN
 
 		RAISE EXCEPTION 'Impossibile eliminare il responsabile di un progetto attivo, prima bisogna sostituirlo!';
 
 		--if del referente di un progetto
-		ELIF EXISTS(select*
+		ELSIF EXISTS(select*
 				  from PROGETTO
-				  where referente = old.matricola and data_fine is null) THEN 
+				  where referente = old.matricola and data_fine is null or data_fine > CURRENT_DATE) THEN
 
 		RAISE EXCEPTION 'Impossibile eliminare il referente di un progetto attivo, prima bisogna sostituirlo!';
 
 		--if del responsabile scientifico in un laboratorio
-		ELIF EXISTS(select*
+		ELSIF EXISTS(select*
 				  from laboratorio
-				  where r_scientifico = old.matricola and data_fine is null) THEN 
+				  where r_scientifico = old.matricola) THEN
 
-		RAISE EXCEPTION 'Impossibile eliminare di responsabile scientifico di un laboratorio , prima bisogna sostituirlo!';
+		RAISE EXCEPTION 'Impossibile eliminare un responsabile scientifico di un laboratorio , prima bisogna sostituirlo!';
 
-		ENDIF;
+		END IF;
 
 		RETURN OLD;
 	END;
-$$
+$$ language plpgsql;
 
 CREATE OR REPLACE TRIGGER eliminazione_impiegati_speciali
 BEFORE DELETE ON IMPIEGATO
 FOR EACH ROW
-EXECUTE function procedure_eliminazione_impiegati_speciali();
+EXECUTE function f_eliminazione_impiegati_speciali();
 
+
+--________________________________________________________________________________________________________________________________--
+
+/*
+	TRIGGER 0.4
+	(update false->true)nel caso in cui viene aggiornato l'attributo booleano dirigente in Impiegato, allora
+	bisogna inserire la data scatto all'interno dello storico.
+	(update true->false)nel caso in cui il dirigente gestisce qualche progetto mandare messaggio di errore, altrimenti,
+	fare inserimento all'interno dello storico della data_scatto 'nonDirigente'->'dirigente'.
+*/
+
+create or replace function f_update_dirigente() returns trigger
+    language plpgsql
+as
+$$
+	DECLARE
+
+	BEGIN
+		IF((OLD.dirigente = false ) AND NEW.dirigente = true)THEN
+			INSERT INTO STORICO VALUES('NonDirigente','dirigente', CURRENT_DATE, new.matricola);
+
+		ELSIF (NEW.dirigente = false AND OLD.dirigente = true)THEN
+			IF EXISTS(SELECT* FROM PROGETTO WHERE responsabile = new.matricola
+											and (data_fine is null or data_fine > CURRENT_DATE) ) THEN
+
+				RAISE EXCEPTION 'NON PUOI DECLASSARE UN DIRIGENTE SE GESTISCE UN PROGETTO, BISOGNA PRIMA CAMBIARLO!';
+
+
+			ELSE
+			INSERT INTO STORICO VALUES('dirigente','NonDirigente', CURRENT_DATE, new.matricola);
+			END IF;
+
+		END IF;
+
+		RETURN NEW;
+
+	END;
+
+$$ language plpgsql;
+
+
+
+CREATE OR REPLACE TRIGGER update_dirigente
+AFTER UPDATE OF dirigente On impiegato
+FOR EACH ROW
+EXECUTE FUNCTION f_update_dirigente();
 
 --________________________________________________________________________________________________________________________________--

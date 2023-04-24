@@ -114,7 +114,7 @@ INSERT INTO STORICO (ruolo_prec, nuovo_ruolo, data_scatto, matricola) VALUES
 
 
 -- Inserimenti nella tabella LABORATORIO
-INSERT INTO LABORATORIO (id_lab, topic, indirizzo, numero_telefono, numero_afferenti, responsabile) VALUES
+INSERT INTO LABORATORIO (id_lab, topic, indirizzo, numero_telefono, numero_afferenti, r_scientifico) VALUES
 ('LAB01', 'Ingegneria', 'Via Roma 1', '0123456789', 5, 'MAT-001'),
 ('LAB02', 'Fisica', 'Via Milano 2', '9876543210', 7, 'MAT-004'),
 ('LAB03', 'Informatica', 'Via Napoli 3', '3333333333', 5, 'MAT-007'),
