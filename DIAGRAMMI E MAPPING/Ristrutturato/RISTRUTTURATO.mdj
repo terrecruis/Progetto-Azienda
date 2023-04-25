@@ -1005,7 +1005,7 @@
 										"$ref": "AAAAAAGG/5kytwUVut0="
 									},
 									"edgePosition": 2,
-									"text": "+0..1"
+									"text": "+0..*"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -1059,12 +1059,12 @@
 										"$ref": "AAAAAAGG/5kytwUT/v8="
 									},
 									"font": "Arial;13;0",
-									"left": 998,
-									"top": 424,
+									"left": 999,
+									"top": 432,
 									"width": 50.21630859375,
 									"height": 13,
-									"alpha": -0.22377466267175605,
-									"distance": 148.70776711389354,
+									"alpha": -0.20617826589121635,
+									"distance": 156.31058825300352,
 									"hostEdge": {
 										"$ref": "AAAAAAGG/5kytwUVut0="
 									},
@@ -3331,7 +3331,7 @@
 								"_parent": {
 									"$ref": "AAAAAAGG/5kytwUR0pc="
 								},
-								"name": "0..1",
+								"name": "0..*",
 								"reference": {
 									"$ref": "AAAAAAGG/5glEADBRYI="
 								}
