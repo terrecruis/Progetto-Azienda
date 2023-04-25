@@ -3886,8 +3886,7 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": -48,
-											"top": 176,
+											"top": 160,
 											"height": 13
 										},
 										{
@@ -3897,8 +3896,8 @@
 												"$ref": "AAAAAAGHCgnrVUmGETs="
 											},
 											"font": "Arial;13;1",
-											"left": 693,
-											"top": 399,
+											"left": 717,
+											"top": 391,
 											"width": 153.333984375,
 											"height": 13,
 											"text": "Afferenza"
@@ -3911,8 +3910,7 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": -48,
-											"top": 176,
+											"top": 160,
 											"width": 73.67724609375,
 											"height": 13,
 											"text": "(from Model)"
@@ -3925,15 +3923,14 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": -48,
-											"top": 176,
+											"top": 160,
 											"height": 13,
 											"horizontalAlignment": 1
 										}
 									],
 									"font": "Arial;13;0",
-									"left": 688,
-									"top": 392,
+									"left": 712,
+									"top": 384,
 									"width": 163.333984375,
 									"height": 25,
 									"stereotypeLabel": {
@@ -3969,36 +3966,19 @@
 												"$ref": "AAAAAAGHCiFdRZba+Hc="
 											},
 											"font": "Arial;13;0",
-											"left": 693,
-											"top": 422,
+											"left": 717,
+											"top": 414,
 											"width": 153.333984375,
 											"height": 13,
 											"text": "+OreGiornaliere: int",
 											"horizontalAlignment": 0
-										},
-										{
-											"_type": "UMLAttributeView",
-											"_id": "AAAAAAGHLFZDhm85Xik=",
-											"_parent": {
-												"$ref": "AAAAAAGHCgnrVkmL/Ag="
-											},
-											"model": {
-												"$ref": "AAAAAAGHLFZDc28kqzA="
-											},
-											"font": "Arial;13;0",
-											"left": 693,
-											"top": 437,
-											"width": 153.333984375,
-											"height": 13,
-											"text": "+TipoContratto: String",
-											"horizontalAlignment": 0
 										}
 									],
 									"font": "Arial;13;0",
-									"left": 688,
-									"top": 417,
+									"left": 712,
+									"top": 409,
 									"width": 163.333984375,
-									"height": 38
+									"height": 23
 								},
 								{
 									"_type": "UMLOperationCompartmentView",
@@ -4010,8 +3990,8 @@
 										"$ref": "AAAAAAGHCgnrVEmD3/Q="
 									},
 									"font": "Arial;13;0",
-									"left": 688,
-									"top": 455,
+									"left": 712,
+									"top": 432,
 									"width": 163.333984375,
 									"height": 10
 								},
@@ -4026,8 +4006,7 @@
 									},
 									"visible": false,
 									"font": "Arial;13;0",
-									"left": -24,
-									"top": 88,
+									"top": 80,
 									"width": 10,
 									"height": 10
 								},
@@ -4042,18 +4021,17 @@
 									},
 									"visible": false,
 									"font": "Arial;13;0",
-									"left": -24,
-									"top": 88,
+									"top": 80,
 									"width": 10,
 									"height": 10
 								}
 							],
 							"font": "Arial;13;0",
 							"containerChangeable": true,
-							"left": 688,
-							"top": 392,
+							"left": 712,
+							"top": 384,
 							"width": 163.333984375,
-							"height": 73,
+							"height": 58,
 							"nameCompartment": {
 								"$ref": "AAAAAAGHCgnrVUmGETs="
 							},
@@ -4086,7 +4064,7 @@
 							"tail": {
 								"$ref": "AAAAAAGHCgnrVUmFjqY="
 							},
-							"points": "775:465;775:503"
+							"points": "784:442;784:503;777:503"
 						},
 						{
 							"_type": "UMLNoteView",
@@ -4660,15 +4638,6 @@
 							},
 							"name": "OreGiornaliere",
 							"type": "int"
-						},
-						{
-							"_type": "UMLAttribute",
-							"_id": "AAAAAAGHLFZDc28kqzA=",
-							"_parent": {
-								"$ref": "AAAAAAGHCgnrVEmD3/Q="
-							},
-							"name": "TipoContratto",
-							"type": "String"
 						}
 					]
 				}

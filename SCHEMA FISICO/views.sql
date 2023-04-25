@@ -28,7 +28,7 @@
 CREATE or replace VIEW Impiegati_attuali AS
 select*
 from Impiegato
-where data_licenziamento IS NULL;
+where data_licenziamento IS NULL or data_licenziamento >= CURRENT_DATE;
 
 --_____________________________________________________________________________________________--
 
@@ -72,7 +72,7 @@ CREATE or replace VIEW Stipendio_medio_laboratorio AS (
 CREATE OR REPLACE VIEW Dirigenti_Attuali AS (
     select *
     from Impiegati_attuali
-    where dirigente is true
+    where dirigente is true 
 );
 
 --_____________________________________________________________________________________________--

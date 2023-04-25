@@ -16,12 +16,6 @@
 
 
 
-
-/*
-	TRIGGER:
-	UN LABORATORIO LAVORA AL MASSIMO AD UN PROGETTO
-*/
-
 /*______________________________________________________________________________________________________________________________
     TRIGGER SU IMPIEGATO:
 
@@ -96,18 +90,15 @@ OK	2.3 ogni volta che aggiungo o elimino un'afferenza impiegato-laboratorio allo
     CALCOLANDOLI GRAZIE ALLA DATA DI ASSUNZIONE.
 */
 
---si implementi un trigger che all inserimento di un impiegato si occupi di inserire i suoi scatti di carriera nella tab storico
-
 CREATE OR REPLACE FUNCTION f_insert_storico() RETURNS TRIGGER AS
 $$
     BEGIN
-        -- Check if the hiring date is consistent with the role to allow insertion
+        --controllo che la data assunzione sia consistente rispetto al tipo di impiegato
         IF (NEW.tipo_impiegato = 'junior') THEN
             IF((NEW.data_assunzione + INTERVAL '3 years') >= CURRENT_DATE ) THEN
                 INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
             ELSE
-                -- Error message
-                RAISE EXCEPTION 'Invalid hiring date for a junior employee';
+                RAISE EXCEPTION 'Data di assunzione non valida per un dipendente junior';
             END IF;
 
         ELSIF (NEW.tipo_impiegato = 'middle') THEN
@@ -116,8 +107,7 @@ $$
                     INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
                     INSERT INTO storico VALUES ('junior', 'middle', NEW.data_assunzione + INTERVAL '3 years', NEW.matricola);
             ELSE
-                -- Error message
-                RAISE EXCEPTION 'Invalid hiring date for a middle employee';
+                RAISE EXCEPTION 'Data di assunzione non valida per un dipendente middle';
             END IF;
 
         ELSIF (NEW.tipo_impiegato = 'senior') THEN
@@ -127,12 +117,12 @@ $$
                 INSERT INTO storico VALUES ('middle', 'senior', NEW.data_assunzione + INTERVAL '7 years', NEW.matricola);
             ELSE
                 -- Error message
-                RAISE EXCEPTION 'Invalid hiring date for a senior employee';
+                RAISE EXCEPTION 'Data di assunzione non valida per un dipendente senior';
             END IF;
 
 
 		--caso in cui l'impiegato è inserito come dirigente[...]
-		if(new.dirigente is true) THEN
+		IF(new.dirigente is true) THEN
 			INSERT INTO STORICO VALUES('NonDirigente','dirigente', CURRENT_DATE, new.matricola);
 		end if;
 
@@ -322,13 +312,22 @@ EXECUTE FUNCTION f_update_dirigente();
 create or replace function f_check_stipendio() returns TRIGGER AS
 $$
 	BEGIN
-		IF(new.tipo_impiegato = 'junior' or new. tipo_impiegato = 'middle') AND EXISTS(SELECT*
-				  FROM Impiegato as i
-				  where i.tipo_impiegato = 'Senior' and i.stipendio < new.stipendio ) then
-
-			RAISE EXCEPTION 'Un dipendente di grado inferiore non può avere uno stipendio più alto di un senior';
+		IF(NEW.dirigente is true)then
+			EXIT;
 		END IF;
 
+		IF(new.tipo_impiegato = 'junior' AND EXISTS(select* from Impiegato as i 
+													where i.tipo_impiegato ='middle' or 
+													i.tipo_impiegato = 'senior 'and i.stipendio < new.stipendio)) then
+
+		RAISE EXCEPTION 'Un impiegato junior non può avere uno stipendio piu alto di un middle';
+		
+		ELSIF(new.tipo_impiegato = 'middle' AND EXISTS(select* from Impiegato as i 
+													where i.tipo_impiegato ='senior' and i.stipendio < new.stipendio)) then
+
+		RAISE EXCEPTION 'Un impiegato middle non può avere uno stipendio piu alto di un senior';
+		END IF;
+	
 		RETURN NEW;
 	END;
 $$ LANGUAGE plpgsql;
@@ -336,6 +335,11 @@ $$ LANGUAGE plpgsql;
 
 create or replace trigger check_stipendio
 after insert on Impiegato
+for each ROW
+execute function f_check_stipendio();
+
+create or replace trigger check_stipendio_update
+after update of stipendio on Impiegato
 for each ROW
 execute function f_check_stipendio();
 
@@ -354,10 +358,10 @@ execute function f_check_stipendio();
 careate or replace function f_check_referente_or_dirigente() returns trigger AS
 $$
 	BEGIN
-		IF(new.responsabile not in (select matricola from impiegato where dirigente is true)) then
+		IF(new.responsabile not in (select matricola from Dirigenti_Attuali)) then
 			RAISE EXCEPTION 'Il responsabile deve essere un dirigente dell azienda!';
         END IF;
-		IF(new.referente not in (select matricola from impiegato where tipo_impiegato = 'senior'))THEN
+		IF(new.referente not in (select matricola from Impiegati_attuali where tipo_impiegato = 'senior'))THEN
 			RAISE EXCEPTION 'Il referente deve essere un impiegato Senior!';
 		END IF;
 
@@ -397,7 +401,7 @@ DECLARE
 BEGIN
     SELECT COUNT(*) INTO lab_count FROM Gestione_Attuale WHERE cup = NEW.cup;
     IF lab_count >= 3 THEN
-        RAISE EXCEPTION 'Non è possibile associare più di tre ID_LAB ad un  CUP';
+        RAISE EXCEPTION 'Non è possibile associare più di tre ID_LAB ad un CUP';
     END IF;
     RETURN NEW;
 END;
@@ -420,7 +424,7 @@ EXECUTE FUNCTION f_max_labs_per_cup();
 CREATE OR REPLACE FUNCTION f_check_responsabile_scientifico() RETURNS TRIGGER AS
 $$
 BEGIN
-	IF NEW.r_scientifico NOT IN (SELECT matricola FROM impiegato WHERE tipo_impiegato = 'senior') THEN
+	IF NEW.r_scientifico NOT IN (SELECT matricola FROM Impiegati_attuali WHERE tipo_impiegato = 'senior') THEN
 		RAISE EXCEPTION 'Il referente scientifico deve essere un senior dell''azienda!';
 	END IF;
 
@@ -493,7 +497,7 @@ CREATE OR REPLACE FUNCTION f_cancella_afferenti() RETURNS trigger AS
 $$
 	BEGIN
 		UPDATE laboratorio
-		SET numero_afferenti = numero_afferenti + 1
+		SET numero_afferenti = numero_afferenti - 1
 		WHERE id_lab = new.id_lab;
 
 	END;
@@ -512,3 +516,8 @@ EXECUTE FUNCTION f_cancella_afferenti();
 --________________________________________________________________________________________________________________________________--
 --________________________________________________________________________________________________________________________________--
 --________________________________________________________________________________________________________________________________--
+
+/*
+	procedura che dato in ingresso una matricola ritorna tutti gli scatti di carriera a 'dirigente'
+	e il tempo totale di dirigenza.
+*/

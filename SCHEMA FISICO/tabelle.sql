@@ -33,7 +33,6 @@
 
 --questo vincolo mi assicura il tipo di impiegato attuale.
 CREATE DOMAIN DOMINIO_IMPIEGATO AS VARCHAR CHECK(VALUE IN('junior','middle','senior'));
-CREATE DOMAIN DOMINIO_CONTRATTO AS VARCHAR CHECK(VALUE IN('determinato','indeterminato'));
 --questo dominio mi assicura il tipo di impiegato al momento dello scatto di carriera
 CREATE DOMAIN DOMINIO_SCATTO AS VARCHAR CHECK(VALUE IN('junior','middle','senior','dirigente','NonDirigente'));
 
@@ -114,7 +113,6 @@ CREATE TABLE IF NOT EXISTS STORICO
 CREATE TABLE IF NOT EXISTS AFFERENZA
 (
 	ore_giornaliere INTEGER NOT NULL,
-	tipo_contratto DOMINIO_CONTRATTO NOT NULL,
 	matricola VARCHAR NOT NULL,
 	id_lab VARCHAR NOT NULL,
 

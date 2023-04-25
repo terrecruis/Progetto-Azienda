@@ -2125,30 +2125,13 @@
 											"height": 13,
 											"text": "+OreGiornaliere: int",
 											"horizontalAlignment": 0
-										},
-										{
-											"_type": "UMLAttributeView",
-											"_id": "AAAAAAGHLFKJY2nRLDI=",
-											"_parent": {
-												"$ref": "AAAAAAGHCg63akj6hjM="
-											},
-											"model": {
-												"$ref": "AAAAAAGHLFKJT2nCR58="
-											},
-											"font": "Arial;13;0",
-											"left": 773,
-											"top": 413,
-											"width": 167,
-											"height": 13,
-											"text": "+TipoContratto: String",
-											"horizontalAlignment": 0
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 768,
 									"top": 393,
 									"width": 177,
-									"height": 38
+									"height": 23
 								},
 								{
 									"_type": "UMLOperationCompartmentView",
@@ -2161,7 +2144,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 768,
-									"top": 431,
+									"top": 416,
 									"width": 177,
 									"height": 10
 								},
@@ -2203,7 +2186,7 @@
 							"left": 768,
 							"top": 368,
 							"width": 177,
-							"height": 73,
+							"height": 58,
 							"nameCompartment": {
 								"$ref": "AAAAAAGHCg63aUj1llE="
 							},
@@ -2237,7 +2220,7 @@
 								"$ref": "AAAAAAGHCg63aUj00SY="
 							},
 							"lineStyle": 1,
-							"points": "842:441;816:511;809:512"
+							"points": "846:426;816:511;809:512"
 						},
 						{
 							"_type": "UMLClassView",
@@ -3428,15 +3411,6 @@
 							},
 							"name": "OreGiornaliere",
 							"type": "int"
-						},
-						{
-							"_type": "UMLAttribute",
-							"_id": "AAAAAAGHLFKJT2nCR58=",
-							"_parent": {
-								"$ref": "AAAAAAGHCg63aEjyqLo="
-							},
-							"name": "TipoContratto",
-							"type": "String"
 						}
 					]
 				},
