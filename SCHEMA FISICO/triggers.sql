@@ -214,6 +214,28 @@ $$ LANGUAGE plpgsql;
 --________________________________________________________________________________________________________________________________--
 
 /*
+	TRIGGER 0.25 :
+	Se voglio modificare il tipo impiegato so fess, stessa cosa per la data_assunzione
+*/
+
+CREATE OR REPLACE FUNCTION f_not_update_tipo_impiegato() RETURNS TRIGGER AS
+    $$
+    BEGIN
+        RAISE EXCEPTION 'NON PUOI MODIFICARE IL TIPO DELL IMPIEGATO O LA DATA DI ASSUNZIONE.';
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+--lancio un eccezione nel momento in cui voglio modificare il tipo_impiegatp
+CREATE OR REPLACE TRIGGER  not_update_tipo_impiegato
+    AFTER UPDATE OF tipo_impiegato,data_assunzione ON impiegato
+    FOR EACH ROW
+    EXECUTE FUNCTION f_not_update_tipo_impiegato();
+
+	
+--________________________________________________________________________________________________________________________________--
+
+/*
 	TRIGGER 0.3 :
 	Nel momento in cui elimino un dirigente che è associato ad un progetto allora devo chiedere all'utente di sostituire
 	il responsabile di quel progetto altrimenti lanciando un messaggio di errore.
