@@ -315,8 +315,7 @@ $$
 		END IF;
 
 		IF(new.tipo_impiegato = 'junior' AND EXISTS(select* from Impiegato as i
-													where i.tipo_impiegato ='middle' or
-													i.tipo_impiegato = 'senior 'and i.stipendio < new.stipendio)) then
+													where i.tipo_impiegato <> 'junior' and i.stipendio < new.stipendio )) then
 
 			RAISE EXCEPTION 'Un impiegato junior non può avere uno stipendio piu alto di un middle';
 		
@@ -399,7 +398,7 @@ DECLARE
     lab_count INTEGER;
 BEGIN
 	--controlla inanzitutto se il progetto è in corso, altrimenti lancia l'errore.
-	IF(new.cup in (select* from PROGETTI_TERMINATI)) then
+	IF(new.cup in (select cup from PROGETTI_TERMINATI)) then
 		RAISE EXCEPTION 'Non puoi associare un progetto terminato ad un laboratorio';
 	END IF;
 
@@ -459,7 +458,7 @@ $$
 	DECLARE
 	num_ore_tot INTEGER;
 	BEGIN
-		IF(new.matricola not in(select* from Impiegati_attuali)) then
+		IF(new.matricola not in(select matricola from Impiegati_attuali)) then
 			RAISE EXCEPTION 'Non puoi far afferire ad un laboratorio un impiegato licenziato';
 		END IF;
 

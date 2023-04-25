@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS IMPIEGATO
 
 	CONSTRAINT data_corretta CHECK(data_assunzione < data_licenziamento),
 	CONSTRAINT impiegato_pk PRIMARY KEY(matricola),
-	CONSTRAINT stipendio_corretto CHECK(stipendio > 0),
+	CONSTRAINT stipendio_corretto CHECK(stipendio > 0)
 );
 
 CREATE TABLE IF NOT EXISTS LABORATORIO
@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS STORICO
 
 	CONSTRAINT storico_pk PRIMARY KEY(nuovo_ruolo, matricola),
 	CONSTRAINT matricola_fk FOREIGN KEY(matricola) REFERENCES IMPIEGATO(matricola)
-		ON UPDATE CASCADE,
+		ON UPDATE CASCADE ON DELETE CASCADE,
 	CONSTRAINT check_ruolo CHECK(((ruolo_prec is NULL) AND (nuovo_ruolo = 'junior')) OR 
 								  ((ruolo_prec = 'junior') AND (nuovo_ruolo = 'middle')) OR
 								  ((ruolo_prec = 'middle') AND (nuovo_ruolo = 'senior'))  OR
