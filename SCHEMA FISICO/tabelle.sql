@@ -21,32 +21,39 @@
 /*
 	SCHEMA LOGICO:
 
-	IMPIEGATO(matricola, nome, cognome, cf, curriculum, stipendio, sesso, foto, tipo, dirigente, data_licenziamento)
+	IMPIEGATO(matricola, nome, cognome, cf, curriculum, stipendio, sesso, foto, tipo, dirigente, data_licenziamento, data_assunzione)
 	LABORATORIO(id_lab, topic, indirizzo, numero_telefono, numero_afferenti, responsabile)
 	PROGETTO(CUP, nome_progetto, budget, data_inizio, data_fine,responsabile,referente)
 	STORICO(ruolo_prec, nuovo_ruolo, data_scatto, matricola)
-	AFFERENZA(matricola, id_lab, ore_giornaliere, tipo_contratto)
+	AFFERENZA(matricola, id_lab, ore_giornaliere)
 	GESTIONE(cup, id_lab)
 	
 */
 
---fare dominio sesso e genere
---FARE DOMINIO MATRICOLA
+/*______________________________________________________________________________________________________________________________*/
 
---questo vincolo mi assicura il tipo di impiegato attuale.
+-- DOMINI DI ALCUNI ATTRIBUTI :
+
+--fare dominio sesso e genere
+CREATE DOMAIN DOMINIO_SESSO AS CHAR CHECK(VALUE IN('M','F','N'));
+--FARE DOMINIO MATRICOLA
+CREATE DOMAIN DOMINIO_MATRICOLA AS VARCHAR(8) CHECK(VALUE LIKE('MAT-%'));
+--DOMINIO DELL'IMPIEGATO
 CREATE DOMAIN DOMINIO_IMPIEGATO AS VARCHAR CHECK(VALUE IN('junior','middle','senior'));
---questo dominio mi assicura il tipo di impiegato al momento dello scatto di carriera
+--DOMINIO DELLO SCATTO DELL'IMPIEGATO
 CREATE DOMAIN DOMINIO_SCATTO AS VARCHAR CHECK(VALUE IN('junior','middle','senior','dirigente','NonDirigente'));
+
+/*______________________________________________________________________________________________________________________________*/
 
 CREATE TABLE IF NOT EXISTS IMPIEGATO
 (
-	matricola CHAR(7),
+	matricola DOMINIO_MATRICOLA,
 	nome VARCHAR NOT NULL,
 	cognome VARCHAR NOT NULL,
 	cf CHAR(16) NOT NULL UNIQUE, 
 	curriculum VARCHAR,
 	stipendio DECIMAL(12,2) NOT NULL,
-	sesso CHAR NOT NULL,
+	sesso DOMINIO_SESSO NOT NULL,
 	foto BYTEA,
 	tipo_impiegato DOMINIO_IMPIEGATO NOT NULL DEFAULT 'junior',
 	dirigente BOOLEAN NOT NULL DEFAULT FALSE,
@@ -56,7 +63,6 @@ CREATE TABLE IF NOT EXISTS IMPIEGATO
 	CONSTRAINT data_corretta CHECK(data_assunzione < data_licenziamento),
 	CONSTRAINT impiegato_pk PRIMARY KEY(matricola),
 	CONSTRAINT stipendio_corretto CHECK(stipendio > 0),
-	CONSTRAINT sesso_corretto CHECK(sesso = 'M' OR sesso = 'F')
 );
 
 CREATE TABLE IF NOT EXISTS LABORATORIO
@@ -66,7 +72,7 @@ CREATE TABLE IF NOT EXISTS LABORATORIO
 	indirizzo VARCHAR NOT NULL,
 	numero_telefono VARCHAR(12), 
 	numero_afferenti INTEGER DEFAULT 1,
-	r_scientifico VARCHAR NOT NULL UNIQUE,
+	r_scientifico DOMINIO_MATRICOLA NOT NULL UNIQUE,
 
 	CONSTRAINT responsabile_scientifico_fk FOREIGN KEY(r_scientifico) REFERENCES IMPIEGATO(matricola)
 		ON UPDATE CASCADE,
@@ -79,15 +85,13 @@ CREATE TABLE IF NOT EXISTS PROGETTO
 	nome_progetto VARCHAR UNIQUE NOT NULL,
 	budget DECIMAL(12,2) NOT NULL,
 	data_inizio DATE NOT NULL,
-	data_fine DATE DEFAULT NULL,  --poichè data_fine non è immediatamente decisa al momento della creazione--
-	responsabile varchar NOT NULL, --perchè il responsabile si conosce a priori
-	referente varchar NOT NULL,   --perchè il referente si conosce a priori
+	data_fine DATE DEFAULT NULL,  
+	responsabile DOMINIO_MATRICOLA NOT NULL, 
+	referente DOMINIO_MATRICOLA NOT NULL,  
 	CONSTRAINT data_fine_corrente CHECK(data_fine>data_inizio),
 	CONSTRAINT budget_corretto CHECK(budget > 0),
 	CONSTRAINT cup_pk PRIMARY KEY(cup),
 
-	--nel caso in cui aggiorno la matricola in impiegato allora l'aggiorno anche in progetto,
-	--nel caso di delete, entra un trigger in funzione
 	CONSTRAINT data_corretta CHECK(data_fine > data_inizio),
 	constraint pk_respnsabilità FOREIGN KEY(responsabile) REFERENCES IMPIEGATO(matricola)
 		ON UPDATE CASCADE,
@@ -98,11 +102,10 @@ CREATE TABLE IF NOT EXISTS PROGETTO
 
 CREATE TABLE IF NOT EXISTS STORICO
 (
-	--dominio scatto tiene conto anche degli scatti dirigenziali.
 	ruolo_prec DOMINIO_SCATTO,
 	nuovo_ruolo DOMINIO_SCATTO NOT NULL, 
 	data_scatto DATE NOT NULL,
-	matricola VARCHAR,
+	matricola DOMINIO_MATRICOLA,
 
 	CONSTRAINT storico_pk PRIMARY KEY(nuovo_ruolo, matricola),
 	CONSTRAINT matricola_fk FOREIGN KEY(matricola) REFERENCES IMPIEGATO(matricola)
@@ -117,7 +120,7 @@ CREATE TABLE IF NOT EXISTS STORICO
 CREATE TABLE IF NOT EXISTS AFFERENZA
 (
 	ore_giornaliere INTEGER NOT NULL,
-	matricola VARCHAR NOT NULL,
+	matricola DOMINIO_MATRICOLA NOT NULL,
 	id_lab VARCHAR NOT NULL,
 
 	CONSTRAINT matricola_afferenza_pk PRIMARY KEY(matricola,id_lab),

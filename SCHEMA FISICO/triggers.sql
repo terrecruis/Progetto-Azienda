@@ -9,11 +9,11 @@
 /*
 	SCHEMA LOGICO:
 
-	IMPIEGATO(matricola, nome, cognome, cf, curriculum, stipendio, sesso, foto, tipo, dirigente, data_licenziamento)
+	IMPIEGATO(matricola, nome, cognome, cf, curriculum, stipendio, sesso, foto, tipo, dirigente, data_licenziamento,data_assunzione)
 	LABORATORIO(id_lab, topic, indirizzo, numero_telefono, numero_afferenti, r_scientifico)
 	PROGETTO(CUP, nome_progetto, budget, data_inizio, data_fine,responsabile,referente)
 	STORICO(ruolo_prec, nuovo_ruolo, data_scatto, matricola)
-	AFFERENZA(matricola, id_lab, ore_giornaliere, tipo_contratto)
+	AFFERENZA(matricola, id_lab, ore_giornaliere)
 	GESTIONE(cup, id_lab)
 */
 
