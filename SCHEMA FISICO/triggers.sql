@@ -127,7 +127,7 @@ $$
 		--caso in cui l'impiegato è inserito come dirigente[...]
 		IF(new.dirigente is true) THEN
 			INSERT INTO STORICO VALUES('NonDirigente','dirigente', CURRENT_DATE, new.matricola);
-		end if;
+		END IF;
 
 
         END IF;
@@ -156,7 +156,7 @@ $$
 	DECLARE
 		--cursore con tutti gli impiegati con le ultime date scatto fatte
 		cursore_impiegati cursor is (select*
-									 from impiegato as i natural join storico as s
+									 from Impiegati_attuali as i natural join storico as s
 									 where s.nuovo_ruolo = i.tipo_impiegato);
 
 		imp_corrente record;
@@ -176,16 +176,15 @@ $$
 					--se sono passati piu di tre anni allora discrimino gli scatti di carriera fatti.
 				IF(imp_corrente.data_assunzione + INTERVAL '3 years' <= CURRENT_DATE) THEN
 
+					INSERT INTO STORICO VALUES('junior','middle',imp_corrente.data_assunzione + INTERVAL '3 YEARS', imp_corrente.matricola);
 					IF(imp_corrente.data_assunzione + INTERVAL '7 years' >= CURRENT_DATE) THEN
-						INSERT INTO STORICO VALUES('junior','middle',imp_corrente.data_assunzione + INTERVAL '3 YEARS', imp_corrente.matricola);
-
+						
 						UPDATE IMPIEGATO
 						SET tipo_impiegato = 'middle'
 						WHERE impiegato.matricola = imp_corrente.matricola;
 
 					--altrimenti sono passati 7 anni quindi aggiorno a senior.
-					ELSIF(imp_corrente.data_assunzione + INTERVAL '7 years' <= CURRENT_DATE) THEN
-						INSERT INTO STORICO VALUES('junior','middle',imp_corrente.data_assunzione + INTERVAL '3 YEARS', imp_corrente.matricola);
+					ELSE
 						INSERT INTO STORICO VALUES('middle','senior',imp_corrente.data_assunzione + INTERVAL '7 YEARS', imp_corrente.matricola);
 
 						UPDATE IMPIEGATO
@@ -272,8 +271,6 @@ EXECUTE function f_eliminazione_impiegati_speciali();
 create or replace function f_update_dirigente() returns trigger
 as
 $$
-	DECLARE
-
 	BEGIN
 		IF((OLD.dirigente = false ) AND NEW.dirigente = true)THEN
 			INSERT INTO STORICO VALUES('NonDirigente','dirigente', CURRENT_DATE, new.matricola);
@@ -286,7 +283,7 @@ $$
 
 
 			ELSE
-			INSERT INTO STORICO VALUES('dirigente','NonDirigente', CURRENT_DATE, new.matricola);
+				INSERT INTO STORICO VALUES('dirigente','NonDirigente', CURRENT_DATE, new.matricola);
 			END IF;
 
 		END IF;
@@ -309,7 +306,6 @@ EXECUTE FUNCTION f_update_dirigente();
 /*
 	VINCOLO DI INTEGRITA' SEMANTICA[...] :
 	Un impiegato Junior o un middle non può avere lo stipendio più alto di un senior.
-	--aggiorna per il middle rispetto al junior...--
 */
 create or replace function f_check_stipendio() returns TRIGGER AS
 $$
@@ -322,12 +318,13 @@ $$
 													where i.tipo_impiegato ='middle' or
 													i.tipo_impiegato = 'senior 'and i.stipendio < new.stipendio)) then
 
-		RAISE EXCEPTION 'Un impiegato junior non può avere uno stipendio piu alto di un middle';
-
-		ELSIF(new.tipo_impiegato = 'middle' AND EXISTS(select* from Impiegato as i
+			RAISE EXCEPTION 'Un impiegato junior non può avere uno stipendio piu alto di un middle';
+		
+		ELSIF(new.tipo_impiegato = 'middle' AND EXISTS(select* from Impiegato as i 
 													where i.tipo_impiegato ='senior' and i.stipendio < new.stipendio)) then
 
-		RAISE EXCEPTION 'Un impiegato middle non può avere uno stipendio piu alto di un senior';
+			RAISE EXCEPTION 'Un impiegato middle non può avere uno stipendio piu alto di un senior';
+			
 		END IF;
 
 		RETURN NEW;
@@ -374,7 +371,7 @@ $$ language plpgsql;
 
 
 CREATE OR REPLACE TRIGGER check_referente_or_dirigente
-AFTER INSERT ON PROGETTO
+BEFORE INSERT ON PROGETTO
 FOR EACH ROW
 EXECUTE FUNCTION f_check_referente_or_dirigente();
 
@@ -407,7 +404,7 @@ BEGIN
 	END IF;
 
     SELECT COUNT(*) INTO lab_count FROM Gestione_Attuale WHERE cup = NEW.cup;
-    IF lab_count >= 3 THEN
+    IF lab_count > 3 THEN
         RAISE EXCEPTION 'Non è possibile associare più di tre ID_LAB ad un CUP';
     END IF;
     RETURN NEW;
@@ -433,10 +430,6 @@ $$
 BEGIN
 	IF NEW.r_scientifico NOT IN (SELECT matricola FROM Impiegati_attuali WHERE tipo_impiegato = 'senior') THEN
 		RAISE EXCEPTION 'Il referente scientifico deve essere un senior dell''azienda!';
-	END IF;
-
-	IF EXISTS (SELECT * FROM laboratorio WHERE r_scientifico = NEW.r_scientifico AND id_lab <> NEW.id_lab) THEN
-		RAISE EXCEPTION 'Il referente scientifico è già associato ad un altro laboratorio!';
 	END IF;
 
 	RETURN NEW;

@@ -30,6 +30,8 @@
 	
 */
 
+--fare dominio sesso e genere
+--FARE DOMINIO MATRICOLA
 
 --questo vincolo mi assicura il tipo di impiegato attuale.
 CREATE DOMAIN DOMINIO_IMPIEGATO AS VARCHAR CHECK(VALUE IN('junior','middle','senior'));
@@ -38,10 +40,10 @@ CREATE DOMAIN DOMINIO_SCATTO AS VARCHAR CHECK(VALUE IN('junior','middle','senior
 
 CREATE TABLE IF NOT EXISTS IMPIEGATO
 (
-	matricola VARCHAR,
+	matricola CHAR(7),
 	nome VARCHAR NOT NULL,
 	cognome VARCHAR NOT NULL,
-	cf CHAR(16) NOT NULL UNIQUE, --codice fiscale
+	cf CHAR(16) NOT NULL UNIQUE, 
 	curriculum VARCHAR,
 	stipendio DECIMAL(12,2) NOT NULL,
 	sesso CHAR NOT NULL,
@@ -62,9 +64,9 @@ CREATE TABLE IF NOT EXISTS LABORATORIO
 	id_lab VARCHAR,
 	topic VARCHAR NOT NULL,
 	indirizzo VARCHAR NOT NULL,
-	numero_telefono VARCHAR,
+	numero_telefono VARCHAR(12), 
 	numero_afferenti INTEGER DEFAULT 1,
-	r_scientifico VARCHAR NOT NULL,
+	r_scientifico VARCHAR NOT NULL UNIQUE,
 
 	CONSTRAINT responsabile_scientifico_fk FOREIGN KEY(r_scientifico) REFERENCES IMPIEGATO(matricola)
 		ON UPDATE CASCADE,
@@ -86,6 +88,7 @@ CREATE TABLE IF NOT EXISTS PROGETTO
 
 	--nel caso in cui aggiorno la matricola in impiegato allora l'aggiorno anche in progetto,
 	--nel caso di delete, entra un trigger in funzione
+	CONSTRAINT data_corretta CHECK(data_fine > data_inizio),
 	constraint pk_respnsabilità FOREIGN KEY(responsabile) REFERENCES IMPIEGATO(matricola)
 		ON UPDATE CASCADE,
 	constraint pk_referente FOREIGN KEY(referente) REFERENCES IMPIEGATO(matricola)
