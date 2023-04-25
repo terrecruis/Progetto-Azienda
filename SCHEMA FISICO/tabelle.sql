@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS AFFERENZA
 	matricola VARCHAR NOT NULL,
 	id_lab VARCHAR NOT NULL,
 
-	CONSTRAINT matricola_afferenza_pk PRIMARY KEY(matricola),
+	CONSTRAINT matricola_afferenza_pk PRIMARY KEY(matricola,id_lab),
 	CONSTRAINT impiegato_afferenza_fk FOREIGN KEY(matricola) REFERENCES IMPIEGATO(matricola)
 		ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT afferenza_laboratorio_fk FOREIGN KEY(id_lab) REFERENCES LABORATORIO(id_lab)

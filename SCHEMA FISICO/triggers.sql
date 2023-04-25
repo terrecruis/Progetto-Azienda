@@ -1,7 +1,10 @@
 /*
     Parte relativa ai trigger [...]
 */
-
+----------------------------------------------------------------------------------------------
+--che succede se inserisco la data licenziamento e poi quando arriva il mio dipendente 
+--sta lavorando su un lab o un prog?(trigger on update e modifica update_database)
+----------------------------------------------------------------------------------------------
 
 /*
 	SCHEMA LOGICO:
@@ -399,6 +402,11 @@ $$
 DECLARE
     lab_count INTEGER;
 BEGIN
+	--controlla inanzitutto se il progetto è in corso, altrimenti lancia l'errore.
+	IF(new.cup in (select* from PROGETTI_TERMINATI))
+		RAISE EXCEPTION 'Non puoi associare un progetto terminato ad un laboratorio';
+	END IF;
+
     SELECT COUNT(*) INTO lab_count FROM Gestione_Attuale WHERE cup = NEW.cup;
     IF lab_count >= 3 THEN
         RAISE EXCEPTION 'Non è possibile associare più di tre ID_LAB ad un CUP';
@@ -449,14 +457,20 @@ EXECUTE FUNCTION f_check_responsabile_scientifico();
 --________________________________________________________________________________________________________________________________--
 /*
 	TRIGGER 2.2
-	controllare che un impiegato non lavora per più di otto ore al giorno (tabella afferenza), altrimenti
+	Il trigger controlla in fase di inserimento o update che un impiegato non può essere associato ad un
+	laboratorio se è licenziato, e controlla anche che
+	un impiegato non lavora per più di otto ore al giorno (tabella afferenza), altrimenti
 	lanciare un messaggio di errore.
 */
-CREATE OR REPLACE FUNCTION f_max_ore_giornaliere() RETURNS TRIGGER AS
+CREATE OR REPLACE FUNCTION f_check_afferenza() RETURNS TRIGGER AS
 $$
 	DECLARE
 	num_ore_tot INTEGER;
 	BEGIN
+		IF(new.matricola not in(select* from Impiegati_attuali))
+			RAISE EXCEPTION 'Non puoi far afferire ad un laboratorio un impiegato licenziato';
+		END IF;
+
 		num_ore_tot := (select sum(ore_giornaliere) from afferenza as a where a.matricola = new.matricola);
 
 		IF (num_ore_tot > 8) THEN
@@ -468,30 +482,33 @@ $$
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER max_ore_giornaliere
+CREATE OR REPLACE TRIGGER check_afferenza
 AFTER INSERT ON AFFERENZA
 FOR EACH ROW
-EXECUTE FUNCTION f_max_ore_giornaliere();
+EXECUTE FUNCTION f_check_afferenza();
 
-CREATE OR REPLACE TRIGGER max_ore_giornaliere
+CREATE OR REPLACE TRIGGER check_afferenza
 AFTER UPDATE OF ore_giornaliere ON AFFERENZA
 FOR EACH ROW
-EXECUTE FUNCTION f_max_ore_giornaliere();
+EXECUTE FUNCTION f_check_afferenza();
 --________________________________________________________________________________________________________________________________--
 /*
 	TRIGGER 2.3
 	ogni volta che aggiungo o elimino un'afferenza impiegato-laboratorio allora aggiorno il numero di afferenti di quel
 	laboratorio.
 */
-CREATE OR REPLACE FUNCTION f_aggiorna_afferenti() RETURNS trigger AS
+create or replace function f_aggiorna_afferenti() returns trigger
+as
 $$
 	BEGIN
 		UPDATE laboratorio
 		SET numero_afferenti = numero_afferenti + 1
 		WHERE id_lab = new.id_lab;
-
+	RETURN NEW;
 	END;
-$$ LANGUAGE plpgsql;
+$$ Language plpgsql;
+
+
 
 CREATE OR REPLACE FUNCTION f_cancella_afferenti() RETURNS trigger AS
 $$
@@ -499,7 +516,7 @@ $$
 		UPDATE laboratorio
 		SET numero_afferenti = numero_afferenti - 1
 		WHERE id_lab = new.id_lab;
-
+	RETURN NEW;
 	END;
 $$ LANGUAGE plpgsql;
 
@@ -516,8 +533,3 @@ EXECUTE FUNCTION f_cancella_afferenti();
 --________________________________________________________________________________________________________________________________--
 --________________________________________________________________________________________________________________________________--
 --________________________________________________________________________________________________________________________________--
-
-/*
-	procedura che dato in ingresso una matricola ritorna tutti gli scatti di carriera a 'dirigente'
-	e il tempo totale di dirigenza.
-*/

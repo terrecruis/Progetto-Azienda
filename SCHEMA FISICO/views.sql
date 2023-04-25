@@ -82,9 +82,42 @@ CREATE OR REPLACE VIEW Dirigenti_Attuali AS (
 */
 
 CREATE OR REPLACE VIEW Gestione_Attuale AS (
-    select *
+    select g.cup,g.id_lab
     from gestione as g natural join progetto as p
     where p.data_fine is null or p.data_fine > CURRENT_DATE
 );
 
 --_____________________________________________________________________________________________--
+/*
+    VIEW DEI RESPONSABILI SCIENTIFICI E I LORO LABORATORI ASSOCIATI
+*/
+
+CREATE OR REPLACE VIEW RESPONSABILI_SCIENTIFICI_ATTUALI AS
+(
+    SELECT l.id_lab, l.r_scientifico
+    FROM laboratorio l
+);
+
+--_____________________________________________________________________________________________--
+/*
+    VIEW DEI REFERENTI E I LORO PROGETTI ATTUALI
+*/
+
+CREATE OR REPLACE VIEW REFERENTI_ATTUALI AS
+(
+    SELECT p.cup ,p.referente
+    FROM progetto as p 
+);
+
+
+
+--_____________________________________________________________________________________________--
+/*
+    VIEW CHE MOSTRA I PROGETTI TERMINATI
+*/
+CREATE OR REPLACE VIEW PROGETTI_TERMINATI AS
+(
+    SELECT *
+    FROM progetto
+    WHERE data_fine < CURRENT_DATE
+);
