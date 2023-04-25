@@ -2,7 +2,7 @@
     Parte relativa ai trigger [...]
 */
 ----------------------------------------------------------------------------------------------
---che succede se inserisco la data licenziamento e poi quando arriva il mio dipendente 
+--che succede se inserisco la data licenziamento e poi quando arriva il mio dipendente
 --sta lavorando su un lab o un prog?(trigger on update e modifica update_database)
 ----------------------------------------------------------------------------------------------
 
@@ -270,7 +270,6 @@ EXECUTE function f_eliminazione_impiegati_speciali();
 */
 
 create or replace function f_update_dirigente() returns trigger
-    language plpgsql
 as
 $$
 	DECLARE
@@ -316,21 +315,21 @@ create or replace function f_check_stipendio() returns TRIGGER AS
 $$
 	BEGIN
 		IF(NEW.dirigente is true)then
-			EXIT;
+		    RETURN NEW;
 		END IF;
 
-		IF(new.tipo_impiegato = 'junior' AND EXISTS(select* from Impiegato as i 
-													where i.tipo_impiegato ='middle' or 
+		IF(new.tipo_impiegato = 'junior' AND EXISTS(select* from Impiegato as i
+													where i.tipo_impiegato ='middle' or
 													i.tipo_impiegato = 'senior 'and i.stipendio < new.stipendio)) then
 
 		RAISE EXCEPTION 'Un impiegato junior non può avere uno stipendio piu alto di un middle';
-		
-		ELSIF(new.tipo_impiegato = 'middle' AND EXISTS(select* from Impiegato as i 
+
+		ELSIF(new.tipo_impiegato = 'middle' AND EXISTS(select* from Impiegato as i
 													where i.tipo_impiegato ='senior' and i.stipendio < new.stipendio)) then
 
 		RAISE EXCEPTION 'Un impiegato middle non può avere uno stipendio piu alto di un senior';
 		END IF;
-	
+
 		RETURN NEW;
 	END;
 $$ LANGUAGE plpgsql;
@@ -358,7 +357,7 @@ execute function f_check_stipendio();
 		altrimenti mando un messaggio di errore e non faccio l'inserimento.
 */
 
-careate or replace function f_check_referente_or_dirigente() returns trigger AS
+create or replace function f_check_referente_or_dirigente() returns trigger AS
 $$
 	BEGIN
 		IF(new.responsabile not in (select matricola from Dirigenti_Attuali)) then
@@ -403,7 +402,7 @@ DECLARE
     lab_count INTEGER;
 BEGIN
 	--controlla inanzitutto se il progetto è in corso, altrimenti lancia l'errore.
-	IF(new.cup in (select* from PROGETTI_TERMINATI))
+	IF(new.cup in (select* from PROGETTI_TERMINATI)) then
 		RAISE EXCEPTION 'Non puoi associare un progetto terminato ad un laboratorio';
 	END IF;
 
@@ -415,7 +414,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER max_labs_per_cup
+CREATE OR REPLACE TRIGGER max_labs_per_cup
 BEFORE INSERT ON GESTIONE
 FOR EACH ROW
 EXECUTE FUNCTION f_max_labs_per_cup();
@@ -444,12 +443,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER check_responsabile_scientifico_insert
+CREATE OR REPLACE TRIGGER check_responsabile_scientifico_insert
 AFTER INSERT ON laboratorio
 FOR EACH ROW
 EXECUTE FUNCTION f_check_responsabile_scientifico();
 
-CREATE TRIGGER check_responsabile_scientifico_update
+CREATE OR REPLACE TRIGGER check_responsabile_scientifico_update
 AFTER UPDATE OF r_scientifico ON laboratorio
 FOR EACH ROW
 EXECUTE FUNCTION f_check_responsabile_scientifico();
@@ -467,7 +466,7 @@ $$
 	DECLARE
 	num_ore_tot INTEGER;
 	BEGIN
-		IF(new.matricola not in(select* from Impiegati_attuali))
+		IF(new.matricola not in(select* from Impiegati_attuali)) then
 			RAISE EXCEPTION 'Non puoi far afferire ad un laboratorio un impiegato licenziato';
 		END IF;
 

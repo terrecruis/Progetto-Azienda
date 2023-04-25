@@ -102,7 +102,8 @@ CREATE TABLE IF NOT EXISTS STORICO
 	matricola VARCHAR,
 
 	CONSTRAINT storico_pk PRIMARY KEY(nuovo_ruolo, matricola),
-	CONSTRAINT matricola_fk FOREIGN KEY(matricola) REFERENCES IMPIEGATO(matricola),
+	CONSTRAINT matricola_fk FOREIGN KEY(matricola) REFERENCES IMPIEGATO(matricola)
+		ON UPDATE CASCADE,
 	CONSTRAINT check_ruolo CHECK(((ruolo_prec is NULL) AND (nuovo_ruolo = 'junior')) OR 
 								  ((ruolo_prec = 'junior') AND (nuovo_ruolo = 'middle')) OR
 								  ((ruolo_prec = 'middle') AND (nuovo_ruolo = 'senior'))  OR

@@ -28,7 +28,7 @@
 CREATE or replace VIEW Impiegati_attuali AS
 select*
 from Impiegato
-where data_licenziamento IS NULL or data_licenziamento >= CURRENT_DATE;
+where data_licenziamento IS NULL or data_licenziamento < CURRENT_DATE;
 
 --_____________________________________________________________________________________________--
 
@@ -120,4 +120,12 @@ CREATE OR REPLACE VIEW PROGETTI_TERMINATI AS
     SELECT *
     FROM progetto
     WHERE data_fine < CURRENT_DATE
+);
+
+--_____________________________________________________________________________________________--
+
+CREATE OR REPLACE VIEW AFFERENZA_ATTUALE AS
+(
+    SELECT a.ore_giornaliere,a.matricola,a.id_lab
+    FROM afferenza as a NATURAL JOIN Impiegati_attuali
 );
