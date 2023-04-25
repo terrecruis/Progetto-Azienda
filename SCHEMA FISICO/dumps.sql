@@ -1,5 +1,5 @@
 /*
-    DUMPS __da aggiornare con i nuovi attributi inseriti[...]
+    DUMPS[...]
 */
 
 --INSERIMENTO NELLA TABELLA IMPIEGATO
