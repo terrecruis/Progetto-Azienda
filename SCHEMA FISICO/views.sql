@@ -112,8 +112,8 @@ CREATE OR REPLACE VIEW RESPONSABILI_SCIENTIFICI_ATTUALI AS
 
 CREATE OR REPLACE VIEW REFERENTI_ATTUALI AS
 (
-    SELECT p.cup ,p.referente
-    FROM progetto as p 
+    SELECT cup ,referente
+    FROM progetto 
 );
 
 --_____________________________________________________________________________________________--
@@ -128,4 +128,14 @@ CREATE OR REPLACE VIEW PROGETTI_TERMINATI AS
 );
 
 --_____________________________________________________________________________________________--
+/*
+    VIEW CHE MOSTRA I PROGETTI ATTIVI   (SERVE PER LA PROCEDURA 0.0)
+*/
+CREATE OR REPLACE VIEW PROGETTI_ATTUALI AS
+(
+    SELECT *
+    FROM progetto
+    WHERE data_fine > CURRENT_DATE OR data_fine is NULL
+);
 
+--_____________________________________________________________________________________________--

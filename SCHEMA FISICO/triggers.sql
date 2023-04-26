@@ -1,10 +1,9 @@
 /*
     Parte relativa ai trigger [...]
 */
-----------------------------------------------------------------------------------------------
---che succede se inserisco la data licenziamento e poi quando arriva il mio dipendente
---sta lavorando su un lab o un prog?(trigger on update e modifica update_database)
-----------------------------------------------------------------------------------------------
+
+
+
 
 /*
 	SCHEMA LOGICO:
@@ -17,16 +16,25 @@
 	GESTIONE(cup, id_lab)
 */
 
+/*______________________________________________________________________________________________________________________________
+	PROCEDURE:
 
+OK	NUMERO 0
+		Creare una funzione di aggiornamento database che quando chiamata, mi aggiunge, se si verificano le condizioni,
+		i nuovi scatti di carriera fatti dagli impiegati e il loro attributo 'tipo_impiegato'
+		aggiorna_database(); (quando la data è inserita nel momento di creazione della tupla)
+OK	NUMERO 1
+		CONTROLLO SU IMPIEGATI LICENZIATI:		
+	  	SE SI SUPERA LA DATA_LICENZIAMENTO DI UN IMPIEGATO (REFERENTI,RESPONSABILI O R_SCIENTIFICI),RISULTERA' CHE LAVORA ANCORA IN QUEL LABORATORIO
+	  	O PROGETTO;	
+	 	LA PROCEDURA SI OCCUPA DI INVIARE UN MESSAGGIO DI WARNING NEL CASO SIANO PRESENTI QUESTI TIPI DI IMPIEGATO E 
+	  	SUGGERISCE IN QUALE LABORATORIO/PROGETTO CAMBIARE L'IMPIEGATO LICENZIATO.
+*/
 
 /*______________________________________________________________________________________________________________________________
     TRIGGER SU IMPIEGATO:
 
 	(parte sullo storico e aggiornamento del database)
-
-OK	0.0 Creare una funzione di aggiornamento database che quando chiamata, mi aggiunge, se si verificano le condizioni,
-		i nuovi scatti di carriera fatti dagli impiegati e il loro attributo 'tipo_impiegato'
-		aggiorna_database(); (quando la data è inserita nel momento di creazione della tupla)
 
 OK	0.1 Ogni volta che aggiungo un impiegato va aggioranta la tabella Storico, inserendo all'interno l'impiegato con
 		ruolo_prec = NULL e nuovo_ruolo = new.tipo, nel caso in cui il tipo inserito sia >junior allora, inserisco
@@ -75,7 +83,6 @@ OK	2.2 controllare che un impiegato non lavora per più di otto ore al giorno (t
 OK	2.3 ogni volta che aggiungo o elimino un'afferenza impiegato-laboratorio allora aggiorno il numero di afferenti di quel
 		laboratorio.
 
-	_________________________________________________________________________________________________________________
 */
 
 
@@ -83,11 +90,11 @@ OK	2.3 ogni volta che aggiungo o elimino un'afferenza impiegato-laboratorio allo
 
 /*
 	PROCEDURE 0.0 : AGGIORNAMENTO DEL DATABASE
-
-	SI SCORRE TUTTI GLI IMPIEGATI PRENDENDO L'ULTIMO SCATTO DI CARRIERA FATTO E
-	CONTROLLA CON LA DATA ODIERNA. SE VI SONO ALTRI SCATTI ALLORA INSERISCE LE NUOVE TUPLE ALL'INTERNO
-	DI STORICO E VA A MODIFICARE IL TIPO DI IMPIEGATO (ATTRIBUTO IMPIEGATO), ALTRIMENTI NON FA NIENTE.
-
+	
+	AGGIORNAMENTO AUTOMATICO SCATTI DI CARRIERA:
+	  SI SCORRE TUTTI GLI IMPIEGATI PRENDENDO L'ULTIMO SCATTO DI CARRIERA FATTO E
+	  CONTROLLA CON LA DATA ODIERNA. SE VI SONO ALTRI SCATTI ALLORA INSERISCE LE NUOVE TUPLE ALL'INTERNO
+	  DI STORICO E VA A MODIFICARE IL TIPO DI IMPIEGATO (ATTRIBUTO IMPIEGATO), ALTRIMENTI NON FA NIENTE.
 */
 
 CREATE OR REPLACE PROCEDURE update_database() AS
@@ -149,6 +156,141 @@ $$
 	END;
 
 $$ LANGUAGE plpgsql;
+
+/*
+	PROCEDURE:
+	
+	CONTROLLO SU IMPIEGATI LICENZIATI:		
+	  SE SI SUPERA LA DATA_LICENZIAMENTO DI UN IMPIEGATO (REFERENTI,RESPONSABILI O R_SCIENTIFICI),RISULTERA' CHE LAVORA ANCORA IN QUEL LABORATORIO
+	  O PROGETTO;	
+	  LA PROCEDURA SI OCCUPA DI INVIARE UN MESSAGGIO DI WARNING NEL CASO SIANO PRESENTI QUESTI TIPI DI IMPIEGATO E 
+	  SUGGERISCE IN QUALE LABORATORIO/PROGETTO CAMBIARE L'IMPIEGATO LICENZIATO.
+
+	  ragionamento:
+	  Abbiamo pensato inizialmente di aggiornare la data_licenziamento di 1 giorno oltre al messaggio,ma questo dal punto di vista teorico
+	  è sbagliato visto che devo tener traccia della data effettiva in cui licenzio il mio dipendente
+	  		
+			questa procedura è utile chiamarla all update della data licenziamento di impiegati
+*/
+
+
+CREATE OR REPLACE PROCEDURE avviso_su_impiegati_licenziati() AS
+$$
+	DECLARE
+		--utilizzo 3 cursori per rendere il codice più leggibile e conoscere subito il messaggio di warning da inviare
+
+		--cursore dei ref_scientifici licenziati presenti in laboratorio
+		cursore_rscientifico CURSOR IS (SELECT i.matricola, l.id_lab
+										FROM impiegato AS i JOIN laboratorio AS l ON i.matricola = l.r_scientifico
+										WHERE i.matricola NOT IN (SELECT matricola FROM Impiegati_attuali));
+
+		--cursore dei referenti licenziati presenti in progetto
+		cursore_referenti CURSOR IS (SELECT i.matricola, pa.cup
+									 FROM impiegato AS i JOIN PROGETTI_ATTUALI AS pa ON (i.matricola = pa.referente)
+									 WHERE i.matricola NOT IN (SELECT matricola FROM Impiegati_attuali));
+
+		--cursore dei responsabili licenziati presenti in progetto
+		cursore_responsabili CURSOR IS (SELECT i.matricola, pa.cup
+									 	FROM impiegato AS i JOIN PROGETTI_ATTUALI AS pa ON (i.matricola = pa.responsabile)
+										WHERE i.matricola NOT IN (SELECT matricola FROM Impiegati_attuali));
+
+		rigacorrente RECORD;
+	BEGIN
+		--loop per responsabili scientifici in laboratorio
+		OPEN cursore_rscientifico;
+		LOOP
+			FETCH cursore_rscientifico INTO rigacorrente;
+			IF NOT FOUND THEN
+				EXIT;
+			END IF;
+
+			RAISE WARNING 'L IMPIEGATO CON MATRICOLA % E STATO LICENZIATO, AGGIORNA IL REFERENTE SCIENTIFICO NEL LABORATORIO %',
+						  rigacorrente.matricola, rigacorrente.id_lab;
+		END LOOP;
+		CLOSE cursore_rscientifico;
+
+		--loop per referenti in progetto
+		OPEN cursore_referenti;
+		LOOP
+			FETCH cursore_referenti INTO rigacorrente;
+			IF NOT FOUND THEN
+				EXIT;
+			END IF;
+
+			RAISE WARNING 'L IMPIEGATO CON MATRICOLA % E STATO LICENZIATO, AGGIORNA IL REFERENTE NEL PROGETTO %',
+						  rigacorrente.matricola, rigacorrente.cup;
+		END LOOP;
+		CLOSE cursore_referenti;
+
+		--loop per responsabili in progetto
+		OPEN cursore_responsabili;
+		LOOP
+			FETCH cursore_responsabili INTO rigacorrente;
+			IF NOT FOUND THEN
+				EXIT;
+			END IF;
+
+			RAISE WARNING 'L IMPIEGATO CON MATRICOLA % E STATO LICENZIATO, AGGIORNA IL RESPONSABILE NEL PROGETTO %',
+						  rigacorrente.matricola, rigacorrente.cup;
+		END LOOP;
+		CLOSE cursore_responsabili;
+	END;
+$$ LANGUAGE plpgsql;
+
+--QUESTO TRIGGER SI ATTIVA ALL UPDATE DELLA DATA LICENZIAMENTO,SE LA DATA E <> NULL FACCIO LA STESSA COSA DELLA PROCEDURA
+--CIOE INVIO UN WARNING
+
+CREATE OR REPLACE FUNCTION f_trigger_avviso_su_impiegati_licenziati() RETURNS TRIGGER AS
+$$
+	DECLARE
+		impiegato RECORD;
+	BEGIN
+		IF NEW.data_licenziamento IS NOT NULL THEN
+		
+			--caso in cui ho un ref_scientifico licenziato
+			SELECT l.r_scientifico, l.id_lab INTO impiegato
+			FROM laboratorio AS l
+			WHERE NEW.matricola = l.r_scientifico
+			AND l.r_scientifico NOT IN (SELECT matricola FROM Impiegati_attuali);
+
+			IF FOUND THEN
+				RAISE WARNING 'L IMPIEGATO CON MATRICOLA % E STATO LICENZIATO, AGGIORNA IL REFERENTE SCIENTIFICO NEL LABORATORIO %',
+								NEW.matricola, impiegato.id_lab;
+			END IF;
+
+			--caso in cui ho un referente
+			SELECT pa.referente, pa.cup INTO impiegato
+			FROM PROGETTI_ATTUALI as pa
+			WHERE NEW.matricola = pa.referente
+			AND pa.referente NOT IN (SELECT matricola FROM Impiegati_attuali);
+
+			IF FOUND THEN
+				RAISE WARNING 'L IMPIEGATO CON MATRICOLA % E STATO LICENZIATO, AGGIORNA IL REFERENTE NEL PROGETTO %',
+								NEW.matricola, impiegato.cup;
+			END IF;
+
+			--caso in cui ho un responsabile
+			SELECT pa.responsabile, pa.cup INTO impiegato
+			FROM PROGETTI_ATTUALI as pa
+			WHERE NEW.matricola = pa.responsabile
+			AND pa.responsabile NOT IN (SELECT matricola FROM Impiegati_attuali);
+
+			IF FOUND THEN
+				RAISE WARNING 'L IMPIEGATO CON MATRICOLA % E STATO LICENZIATO, AGGIORNA IL RESPONSABILE NEL PROGETTO %',
+								NEW.matricola, impiegato.cup;
+			END IF;
+
+		END IF;
+
+		RETURN NEW;
+	END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER trigger_avviso_su_impiegati_licenziati
+AFTER UPDATE OF data_licenziamento ON impiegato
+FOR EACH ROW
+EXECUTE FUNCTION f_trigger_avviso_su_impiegati_licenziati();
 
 
 --________________________________________________________________________________________________________________________________--

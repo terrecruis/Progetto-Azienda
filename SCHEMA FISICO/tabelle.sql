@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS PROGETTO
 	data_fine DATE DEFAULT NULL,  
 	responsabile DOMINIO_MATRICOLA NOT NULL, 
 	referente DOMINIO_MATRICOLA NOT NULL,  
+	
 	CONSTRAINT data_fine_corrente CHECK(data_fine>data_inizio),
 	CONSTRAINT budget_corretto CHECK(budget > 0),
 	CONSTRAINT cup_pk PRIMARY KEY(cup),
