@@ -24,13 +24,13 @@
 
 	(parte sullo storico e aggiornamento del database)
 
-OK	0.0 Ogni volta che aggiungo un impiegato va aggioranta la tabella Storico, inserendo all'interno l'impiegato con
-		ruolo_prec = NULL e nuovo_ruolo = new.tipo, nel caso in cui il tipo inserito sia >junior allora, inserisco
-        all'interno dello storico il resto degli scatti di carriera rimanenti.
-
-OK	0.1 Creare una funzione di aggiornamento database che quando chiamata, mi aggiunge, se si verificano le condizioni,
+OK	0.0 Creare una funzione di aggiornamento database che quando chiamata, mi aggiunge, se si verificano le condizioni,
 		i nuovi scatti di carriera fatti dagli impiegati e il loro attributo 'tipo_impiegato'
 		aggiorna_database(); (quando la data è inserita nel momento di creazione della tupla)
+
+OK	0.1 Ogni volta che aggiungo un impiegato va aggioranta la tabella Storico, inserendo all'interno l'impiegato con
+		ruolo_prec = NULL e nuovo_ruolo = new.tipo, nel caso in cui il tipo inserito sia >junior allora, inserisco
+        all'interno dello storico il resto degli scatti di carriera rimanenti.
 
 OK	0.2 potremmo fare qualche vincolo di integrita semantica
 		(esempio un junior non puo avere lo stipendio piu alto di un senior)
@@ -79,71 +79,10 @@ OK	2.3 ogni volta che aggiungo o elimino un'afferenza impiegato-laboratorio allo
 */
 
 
-
-
-
 --________________________________________________________________________________________________________________________________--
 
 /*
-    --TRIGGER 0.0 : INSERIMENTO DI UN IMPIEGATO, CONTROLLO VALIDITA' DI DATA E NEL CASO POSITIVO AGGIUNGO NELLO STORICO.
-
-    NEL MOMENTO IN CUI INSERISCO UN NUOVO IMPIEGATO, AGGIORNO IL SUO STATUS
-    ALL'INTERNO DELLO STORICO CON LA DATA DI SCATTO CON IL TIPO INSERITO,
-    NEL CASO IN CUI IL TIPO E' >JUNIOR, ALLORA INSERISCE ANCHE GLI ALTRI SCATTI,
-    CALCOLANDOLI GRAZIE ALLA DATA DI ASSUNZIONE.
-*/
-
-CREATE OR REPLACE FUNCTION f_insert_storico() RETURNS TRIGGER AS
-$$
-    BEGIN
-        --controllo che la data assunzione sia consistente rispetto al tipo di impiegato
-        IF (NEW.tipo_impiegato = 'junior') THEN
-            IF((NEW.data_assunzione + INTERVAL '3 years') >= CURRENT_DATE ) THEN
-                INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
-            ELSE
-                RAISE EXCEPTION 'Data di assunzione non valida per un dipendente junior';
-            END IF;
-
-        ELSIF (NEW.tipo_impiegato = 'middle') THEN
-            IF ((NEW.data_assunzione + INTERVAL '3 years') <= CURRENT_DATE AND
-                NEW.data_assunzione + INTERVAL '7 years' >= CURRENT_DATE ) THEN
-                    INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
-                    INSERT INTO storico VALUES ('junior', 'middle', NEW.data_assunzione + INTERVAL '3 years', NEW.matricola);
-            ELSE
-                RAISE EXCEPTION 'Data di assunzione non valida per un dipendente middle';
-            END IF;
-
-        ELSIF (NEW.tipo_impiegato = 'senior') THEN
-            IF((NEW.data_assunzione + INTERVAL '7 years') <= CURRENT_DATE ) THEN
-                INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
-                INSERT INTO storico VALUES ('junior', 'middle', NEW.data_assunzione + INTERVAL '3 years', NEW.matricola);
-                INSERT INTO storico VALUES ('middle', 'senior', NEW.data_assunzione + INTERVAL '7 years', NEW.matricola);
-            ELSE
-                -- Error message
-                RAISE EXCEPTION 'Data di assunzione non valida per un dipendente senior';
-            END IF;
-
-
-		--caso in cui l'impiegato è inserito come dirigente[...]
-		IF(new.dirigente is true) THEN
-			INSERT INTO STORICO VALUES('NonDirigente','dirigente', CURRENT_DATE, new.matricola);
-		END IF;
-
-
-        END IF;
-        RETURN NEW;
-    END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE TRIGGER insert_storico
-AFTER INSERT ON impiegato
-FOR EACH ROW
-EXECUTE FUNCTION f_insert_storico();
-
---________________________________________________________________________________________________________________________________--
-
-/*
-	PROCEDURE 0.1 : AGGIORNAMENTO DEL DATABASE
+	PROCEDURE 0.0 : AGGIORNAMENTO DEL DATABASE
 
 	SI SCORRE TUTTI GLI IMPIEGATI PRENDENDO L'ULTIMO SCATTO DI CARRIERA FATTO E
 	CONTROLLA CON LA DATA ODIERNA. SE VI SONO ALTRI SCATTI ALLORA INSERISCE LE NUOVE TUPLE ALL'INTERNO
@@ -210,6 +149,65 @@ $$
 	END;
 
 $$ LANGUAGE plpgsql;
+
+
+--________________________________________________________________________________________________________________________________--
+
+/*
+    --TRIGGER 0.1 : INSERIMENTO DI UN IMPIEGATO, CONTROLLO VALIDITA' DI DATA E NEL CASO POSITIVO AGGIUNGO NELLO STORICO.
+
+    NEL MOMENTO IN CUI INSERISCO UN NUOVO IMPIEGATO, AGGIORNO IL SUO STATUS
+    ALL'INTERNO DELLO STORICO CON LA DATA DI SCATTO CON IL TIPO INSERITO,
+    NEL CASO IN CUI IL TIPO E' >JUNIOR, ALLORA INSERISCE ANCHE GLI ALTRI SCATTI,
+    CALCOLANDOLI GRAZIE ALLA DATA DI ASSUNZIONE.
+*/
+
+CREATE OR REPLACE FUNCTION f_insert_storico() RETURNS TRIGGER AS
+$$
+    BEGIN
+        --controllo che la data assunzione sia consistente rispetto al tipo di impiegato
+        IF (NEW.tipo_impiegato = 'junior') THEN
+            IF((NEW.data_assunzione + INTERVAL '3 years') >= CURRENT_DATE ) THEN
+                INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
+            ELSE
+                RAISE EXCEPTION 'Data di assunzione non valida per un dipendente junior';
+            END IF;
+
+        ELSIF (NEW.tipo_impiegato = 'middle') THEN
+            IF ((NEW.data_assunzione + INTERVAL '3 years') <= CURRENT_DATE AND
+                NEW.data_assunzione + INTERVAL '7 years' >= CURRENT_DATE ) THEN
+                    INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
+                    INSERT INTO storico VALUES ('junior', 'middle', NEW.data_assunzione + INTERVAL '3 years', NEW.matricola);
+            ELSE
+                RAISE EXCEPTION 'Data di assunzione non valida per un dipendente middle';
+            END IF;
+
+        ELSIF (NEW.tipo_impiegato = 'senior') THEN
+            IF((NEW.data_assunzione + INTERVAL '7 years') <= CURRENT_DATE ) THEN
+                INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
+                INSERT INTO storico VALUES ('junior', 'middle', NEW.data_assunzione + INTERVAL '3 years', NEW.matricola);
+                INSERT INTO storico VALUES ('middle', 'senior', NEW.data_assunzione + INTERVAL '7 years', NEW.matricola);
+            ELSE
+                -- Error message
+                RAISE EXCEPTION 'Data di assunzione non valida per un dipendente senior';
+            END IF;
+
+
+		--caso in cui l'impiegato è inserito come dirigente[...]
+		IF(new.dirigente is true) THEN
+			INSERT INTO STORICO VALUES('NonDirigente','dirigente', CURRENT_DATE, new.matricola);
+		END IF;
+
+
+        END IF;
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER insert_storico
+AFTER INSERT ON impiegato
+FOR EACH ROW
+EXECUTE FUNCTION f_insert_storico();
 
 --________________________________________________________________________________________________________________________________--
 
