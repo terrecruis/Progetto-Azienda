@@ -107,7 +107,9 @@ CREATE TABLE IF NOT EXISTS STORICO
 	data_scatto DATE NOT NULL,
 	matricola DOMINIO_MATRICOLA,
 
-	CONSTRAINT storico_pk PRIMARY KEY(nuovo_ruolo, matricola),
+	--in questo modo, un impiegato non può fare lo stesso scatto dirigenziale  nello stesso giorno,
+	--aggiungendo alla primary key anche la data_scatto.
+	CONSTRAINT storico_pk PRIMARY KEY(nuovo_ruolo, matricola,data_scatto),
 	CONSTRAINT matricola_fk FOREIGN KEY(matricola) REFERENCES IMPIEGATO(matricola)
 		ON UPDATE CASCADE ON DELETE CASCADE,
 	CONSTRAINT check_ruolo CHECK(((ruolo_prec is NULL) AND (nuovo_ruolo = 'junior')) OR 

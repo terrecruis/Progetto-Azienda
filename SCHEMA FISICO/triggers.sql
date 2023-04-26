@@ -215,13 +215,14 @@ $$ LANGUAGE plpgsql;
 
 /*
 	TRIGGER 0.25 :
-	Se voglio modificare il tipo impiegato so fess, stessa cosa per la data_assunzione
+	Se voglio modificare il tipo impiegato non posso farlo una volta inserito, stessa cosa per la data_assunzione
+	in modo tale da rendere consistente la base di dati.
 */
 
 CREATE OR REPLACE FUNCTION f_not_update_tipo_impiegato() RETURNS TRIGGER AS
     $$
     BEGIN
-        RAISE EXCEPTION 'NON PUOI MODIFICARE IL TIPO DELL IMPIEGATO O LA DATA DI ASSUNZIONE.';
+        RAISE EXCEPTION 'UNA VOLTA INSERITO UN IMPIEGATO NON PUOI MODIFICARE IL SUO TIPO O LA DATA DI ASSUNZIONE.';
         RETURN NEW;
     END;
     $$ LANGUAGE plpgsql;
