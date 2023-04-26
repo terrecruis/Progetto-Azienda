@@ -1016,23 +1016,6 @@
 										},
 										{
 											"_type": "UMLAttributeView",
-											"_id": "AAAAAAGGx2m2Y28Xmho=",
-											"_parent": {
-												"$ref": "AAAAAAGGxolUf1MlMi8="
-											},
-											"model": {
-												"$ref": "AAAAAAGGx2m2VW8UuWs="
-											},
-											"font": "Arial;13;0",
-											"left": 925,
-											"top": 501,
-											"width": 189.45849609375,
-											"height": 13,
-											"text": "+idLab: Varchar",
-											"horizontalAlignment": 0
-										},
-										{
-											"_type": "UMLAttributeView",
 											"_id": "AAAAAAGG5YbnDbBWEHQ=",
 											"_parent": {
 												"$ref": "AAAAAAGGxolUf1MlMi8="
@@ -1042,7 +1025,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 925,
-											"top": 516,
+											"top": 501,
 											"width": 189.45849609375,
 											"height": 13,
 											"text": "+Indirizzo: String",
@@ -1059,7 +1042,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 925,
-											"top": 531,
+											"top": 516,
 											"width": 189.45849609375,
 											"height": 13,
 											"text": "+NumeroTelefono: Varchar",
@@ -1076,7 +1059,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 925,
-											"top": 546,
+											"top": 531,
 											"width": 189.45849609375,
 											"height": 13,
 											"text": "+NumeroAfferenti<<derive>>: Int",
@@ -1087,7 +1070,7 @@
 									"left": 920,
 									"top": 481,
 									"width": 199.45849609375,
-									"height": 83
+									"height": 68
 								},
 								{
 									"_type": "UMLOperationCompartmentView",
@@ -1100,7 +1083,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 920,
-									"top": 564,
+									"top": 549,
 									"width": 199.45849609375,
 									"height": 10
 								},
@@ -1142,7 +1125,7 @@
 							"left": 920,
 							"top": 456,
 							"width": 199.45849609375,
-							"height": 118,
+							"height": 103,
 							"nameCompartment": {
 								"$ref": "AAAAAAGGxolUf1Mg7qI="
 							},
@@ -2256,7 +2239,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 967,
-									"top": 583,
+									"top": 568,
 									"width": 32.88720703125,
 									"height": 13,
 									"alpha": -1.1193431996165384,
@@ -2278,7 +2261,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 987,
-									"top": 595,
+									"top": 580,
 									"height": 13,
 									"alpha": -0.7853981633974483,
 									"distance": 40,
@@ -2298,7 +2281,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 1028,
-									"top": 588,
+									"top": 573,
 									"height": 13,
 									"alpha": 0.5235987755982988,
 									"distance": 25,
@@ -2346,7 +2329,7 @@
 							"tail": {
 								"$ref": "AAAAAAGGxolGoFL15DE="
 							},
-							"points": "755:678;1016:678;1016:573",
+							"points": "755:678;1016:678;1016:558",
 							"showVisibility": true,
 							"nameLabel": {
 								"$ref": "AAAAAAGGxpIdprZ4+9U="
@@ -4390,15 +4373,6 @@
 							},
 							"name": "Topic",
 							"type": "String"
-						},
-						{
-							"_type": "UMLAttribute",
-							"_id": "AAAAAAGGx2m2VW8UuWs=",
-							"_parent": {
-								"$ref": "AAAAAAGGxolUflMdOo8="
-							},
-							"name": "idLab",
-							"type": "Varchar"
 						},
 						{
 							"_type": "UMLAttribute",
