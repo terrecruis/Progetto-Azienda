@@ -5,6 +5,52 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--DA FARE
+/*
+	1.
+		QUANDO PRENDO UN IMPIEGATO DIRIGENTE E LO RENDO NON DIRIGENTE DEVO ANCHE ACCERTARMI CHE SI ABBASSI IL SUO STIPENDIO IN BASE AL RUOLO
+
+	2.
+		INSERT INTO IMPIEGATO (matricola, nome, cognome, cf, curriculum, stipendio, sesso, tipo_impiegato, dirigente, data_assunzione,data_licenziamento)
+		VALUES
+		('MAT-100', 'IMPIEGATO', 'LICENZIATO', 'RSSMRA0qq01F205F', 'Laurea in Informatica', 12000.00, 'M', 'junior', false, '1998-01-01','1999-01-01');
+
+		NON MI FA INSERIRE QUESTO VECCHIO IMPIEGATO PERCHE LA DATA NON CORRISPONDE AL TIPO IMPIEGATO (AGGIORNA TRIGGER)
+	
+	3.
+		bloccare la modifica dell attributo (dirigente) quando l impiegato è stato licenziato
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
 	SCHEMA LOGICO:
 
@@ -312,7 +358,7 @@ $$
             IF((NEW.data_assunzione + INTERVAL '3 years') >= CURRENT_DATE ) THEN
                 INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
             ELSE
-                RAISE EXCEPTION 'Data di assunzione non valida per un dipendente junior';
+                RAISE EXCEPTION 'DATA DI ASSUNZIONE NON VALIDA PER UN DIPENDENTE JUNIOR';
             END IF;
 
         ELSIF (NEW.tipo_impiegato = 'middle') THEN
@@ -321,7 +367,7 @@ $$
                     INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
                     INSERT INTO storico VALUES ('junior', 'middle', NEW.data_assunzione + INTERVAL '3 years', NEW.matricola);
             ELSE
-                RAISE EXCEPTION 'Data di assunzione non valida per un dipendente middle';
+                RAISE EXCEPTION 'DATA DI ASSUNZIONE NON VALIDA PER UN DIPENDENTE MIDDLE';
             END IF;
 
         ELSIF (NEW.tipo_impiegato = 'senior') THEN
@@ -331,7 +377,7 @@ $$
                 INSERT INTO storico VALUES ('middle', 'senior', NEW.data_assunzione + INTERVAL '7 years', NEW.matricola);
             ELSE
                 -- Error message
-                RAISE EXCEPTION 'Data di assunzione non valida per un dipendente senior';
+                RAISE EXCEPTION 'DATA DI ASSUNZIONE NON VALIDA PER UN DIPENDENTE SENIOR';
             END IF;
 
 
@@ -387,28 +433,28 @@ CREATE OR REPLACE TRIGGER  not_update_tipo_impiegato
 create or replace function f_eliminazione_impiegati_speciali() RETURNS TRIGGER AS
 $$
 	BEGIN
-
 		--if del responsabile di un progetto
 		IF EXISTS(select*
-				  from PROGETTO
-				  where responsabile = old.matricola and data_fine is null or data_fine > CURRENT_DATE) THEN
+				  from PROGETTI_ATTUALI
+				  where responsabile = NEW.matricola) THEN
 
-		RAISE EXCEPTION 'Impossibile eliminare il responsabile di un progetto attivo, prima bisogna sostituirlo!';
+		RAISE EXCEPTION 'IMPOSSIBILE ELIMINARE IL RESPONSABILE DI UN PROGETTO ATTIVO, PRIMA BISOGNA SOSTITUIRLO!';
+		END IF;
 
 		--if del referente di un progetto
-		ELSIF EXISTS(select*
-				  from PROGETTO
-				  where referente = old.matricola and data_fine is null or data_fine > CURRENT_DATE) THEN
+		IF EXISTS(select*
+				  from PROGETTI_ATTUALI
+				  where referente = NEW.matricola) THEN
 
-		RAISE EXCEPTION 'Impossibile eliminare il referente di un progetto attivo, prima bisogna sostituirlo!';
+		RAISE EXCEPTION 'IMPOSSIBILE ELIMINARE IL REFERENTE DI UN PROGETTO ATTIVO, PRIMA BISOGNA SOSTITUIRLO!';
+		END IF;
 
 		--if del responsabile scientifico in un laboratorio
-		ELSIF EXISTS(select*
-				  from laboratorio
-				  where r_scientifico = old.matricola) THEN
+		IF EXISTS(select*
+				  from LABORATORIO
+				  where r_scientifico = NEW.matricola) THEN
 
-		RAISE EXCEPTION 'Impossibile eliminare un responsabile scientifico di un laboratorio , prima bisogna sostituirlo!';
-
+		RAISE EXCEPTION 'IMPOSSIBILE ELIMINARE IL RESPONSABILE SCIENTIFICO DI UN LABORATORIO, PRIMA BISOGNA SOSTITUIRLO!';
 		END IF;
 
 		RETURN OLD;
@@ -480,12 +526,12 @@ $$
 		IF(new.tipo_impiegato = 'junior' AND EXISTS(select* from Impiegato as i
 													where i.tipo_impiegato <> 'junior' and i.stipendio < new.stipendio )) then
 
-			RAISE EXCEPTION 'Un impiegato junior non può avere uno stipendio piu alto di un middle';
+			RAISE EXCEPTION 'UN IMPIEGATO JUNIOR NON PUO AVERE LO STIPENDIO PIU ALTO DI UN MIDDLE';
 		
 		ELSIF(new.tipo_impiegato = 'middle' AND EXISTS(select* from Impiegato as i 
 													where i.tipo_impiegato ='senior' and i.stipendio < new.stipendio)) then
 
-			RAISE EXCEPTION 'Un impiegato middle non può avere uno stipendio piu alto di un senior';
+			RAISE EXCEPTION 'UN IMPIEGATO MIDDLE NON PUO AVERE LO STIPENDIO PIU ALTO DI UN SENIOR';
 			
 		END IF;
 
@@ -516,10 +562,10 @@ create or replace function f_check_referente_or_dirigente() returns trigger AS
 $$
 	BEGIN
 		IF(new.responsabile not in (select matricola from Dirigenti_Attuali)) then
-			RAISE EXCEPTION 'Il responsabile deve essere un dirigente dell azienda!';
+			RAISE EXCEPTION 'IL RESPONSABILE DEVE ESSERE UN DIRIGENTE NON LICENZIATO!';
         END IF;
 		IF(new.referente not in (select matricola from Impiegati_attuali where tipo_impiegato = 'senior'))THEN
-			RAISE EXCEPTION 'Il referente deve essere un impiegato Senior!';
+			RAISE EXCEPTION 'IL REFERENTE DEVE ESSERE UN IMPIEGATO SENIOR NON LICENZIATO!';
 		END IF;
 
 	RETURN NEW;
@@ -547,12 +593,12 @@ DECLARE
 BEGIN
 	--controlla inanzitutto se il progetto è in corso, altrimenti lancia l'errore.
 	IF(new.cup in (select cup from PROGETTI_TERMINATI)) then
-		RAISE EXCEPTION 'Non puoi associare un progetto terminato ad un laboratorio';
+		RAISE EXCEPTION 'NON PUOI ASSOCIARE UN PROGETTO TERMINATO AD UN LABORATORIO';
 	END IF;
 
     SELECT COUNT(*) INTO lab_count FROM Gestione_Attuale WHERE cup = NEW.cup;
     IF lab_count > 3 THEN
-        RAISE EXCEPTION 'Non è possibile associare più di tre ID_LAB ad un CUP';
+        RAISE EXCEPTION 'NON E POSSIBILE ASSOCIARE PIU DI TRE ID_LAB AD UN CUP (CODICE PROGETTO)';
     END IF;
     RETURN NEW;
 END;
@@ -576,7 +622,7 @@ CREATE OR REPLACE FUNCTION f_check_responsabile_scientifico() RETURNS TRIGGER AS
 $$
 BEGIN
 	IF NEW.r_scientifico NOT IN (SELECT matricola FROM Impiegati_attuali WHERE tipo_impiegato = 'senior') THEN
-		RAISE EXCEPTION 'Il referente scientifico deve essere un senior dell''azienda!';
+		RAISE EXCEPTION 'IL REFERENTE SCIENTIFICO DEVE ESSERE UN SENIOR ATTUALE DELL AZIENDA!';
 	END IF;
 
 	RETURN NEW;
@@ -598,19 +644,17 @@ EXECUTE FUNCTION check_responsabile_scientifico();
 */
 CREATE OR REPLACE FUNCTION f_check_afferenza() RETURNS TRIGGER AS
 $$
-	DECLARE
-	num_ore_tot INTEGER;
 	BEGIN
+		--E SE IO VOLESSI INSERIRE UN IMPIEGATO LICENZIATO IN AFFERENZA IN UN SECONDO MOMENTO PER TENERNE TRACCIA?
 		IF(new.matricola not in(select matricola from Impiegati_attuali)) then
-			RAISE EXCEPTION 'Non puoi far afferire ad un laboratorio un impiegato licenziato';
+			RAISE EXCEPTION 'NON PUOI FAR AFFERIRE AD UN LABORATORIO UN IMPIEGATO LICENZITO';
 		END IF;
-
-		num_ore_tot := (select sum(ore_giornaliere) from afferenza as a where a.matricola = new.matricola);
-
-		IF (num_ore_tot > 8) THEN
+		--
+		--non faccio la count delle ore giornaliere perche (matr,cod_lab) è pk e quindi univoco nella tabella afferenza)
+		IF (new.ore_giornaliere > 8) THEN
 			RAISE EXCEPTION 'UN IMPIEGATO NON PUO LAVORARE PER PIU DI OTTO ORE AL GIORNO!';
 		END IF;
-
+		RETURN NEW;
 	END;
 
 $$ LANGUAGE plpgsql;
@@ -643,7 +687,7 @@ $$
 	BEGIN
 		UPDATE laboratorio
 		SET numero_afferenti = numero_afferenti - 1
-		WHERE id_lab = new.id_lab;
+		WHERE id_lab = old.id_lab;
 	RETURN NEW;
 	END;
 $$ LANGUAGE plpgsql;

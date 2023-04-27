@@ -139,3 +139,19 @@ CREATE OR REPLACE VIEW PROGETTI_ATTUALI AS
 );
 
 --_____________________________________________________________________________________________--
+
+CREATE OR REPLACE VIEW AFFERENZA_ATTUALE AS
+(
+    SELECT a.matricola, a.id_lab
+    FROM afferenza as a NATURAL JOIN Impiegati_attuali 
+);
+
+--_____________________________________________________________________________________________--
+
+CREATE OR REPLACE VIEW STORICO_DIRIGENTI AS
+(
+    SELECT *
+    FROM storico 
+    WHERE nuovo_ruolo='dirigente'
+    ORDER BY matricola,data_scatto
+);
