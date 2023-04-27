@@ -240,7 +240,7 @@ $$ LANGUAGE plpgsql;
 --QUESTO TRIGGER SI ATTIVA ALL UPDATE DELLA DATA LICENZIAMENTO,SE LA DATA E <> NULL FACCIO LA STESSA COSA DELLA PROCEDURA
 --CIOE INVIO UN WARNING
 
-CREATE OR REPLACE FUNCTION f_trigger_avviso_su_impiegati_licenziati() RETURNS TRIGGER AS
+CREATE OR REPLACE FUNCTION f_avviso_su_impiegati_licenziati() RETURNS TRIGGER AS
 $$
 	DECLARE
 		impiegato RECORD;
@@ -290,7 +290,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE TRIGGER trigger_avviso_su_impiegati_licenziati
 AFTER UPDATE OF data_licenziamento ON impiegato
 FOR EACH ROW
-EXECUTE FUNCTION f_trigger_avviso_su_impiegati_licenziati();
+EXECUTE FUNCTION f_avviso_su_impiegati_licenziati();
 
 
 --________________________________________________________________________________________________________________________________--
@@ -494,13 +494,9 @@ $$
 $$ LANGUAGE plpgsql;
 
 
-create or replace trigger check_stipendio
-after insert on Impiegato
-for each ROW
-execute function f_check_stipendio();
 
-create or replace trigger check_stipendio_update
-after update of stipendio on Impiegato
+create or replace trigger check_stipendio
+after insert or update of stipendio on Impiegato
 for each ROW
 execute function f_check_stipendio();
 
@@ -532,26 +528,15 @@ $$
 $$ language plpgsql;
 
 
-CREATE OR REPLACE TRIGGER check_referente_or_dirigente
-BEFORE INSERT ON PROGETTO
-FOR EACH ROW
-EXECUTE FUNCTION f_check_referente_or_dirigente();
-
---________________________________________________________________________________________________________________________________--
-/*
-		TRIGGER 1.1
-		se si aggiorna un responsabile o un referente allora si verifichi che il nuovo valore sia assegnabile.
-*/
-
 CREATE OR REPLACE TRIGGER check_update_dirigente_or_responsabile
-AFTER UPDATE of referente, responsabile ON PROGETTO
+AFTER INSERT OR UPDATE OF referente, responsabile ON PROGETTO
 FOR EACH ROW
 EXECUTE FUNCTION f_check_referente_or_dirigente();
 
 --________________________________________________________________________________________________________________________________--
 
 /*
-		1.2(vincolo di gestione) Un progetto ATTIVI (data fine = null) ha al più
+		1.2(vincolo di gestione) Un progetto ATTIVO (data fine = null) ha al più
 		tre laboratori associati. (sulla tabella gestione).
 */
 
@@ -585,7 +570,7 @@ EXECUTE FUNCTION f_max_labs_per_cup();
 
 /*
 	TRIGGER 2.0 and 2.05 : RESPONSABILE SCIENTIFICO
-	verifica che quando inserisco un laboratorio, il suo responsabile scientifico sia senior e responsabile solo di QUEL laboratorio.
+	verifica che quando inserisco o update di un laboratorio, il suo responsabile scientifico sia senior.
 */
 CREATE OR REPLACE FUNCTION f_check_responsabile_scientifico() RETURNS TRIGGER AS
 $$
@@ -598,15 +583,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER check_responsabile_scientifico_insert
-AFTER INSERT ON laboratorio
+CREATE OR REPLACE TRIGGER check_responsabile_scientifico
+BEFORE INSERT OR UPDATE OF r_scientifico ON laboratorio
 FOR EACH ROW
-EXECUTE FUNCTION f_check_responsabile_scientifico();
-
-CREATE OR REPLACE TRIGGER check_responsabile_scientifico_update
-AFTER UPDATE OF r_scientifico ON laboratorio
-FOR EACH ROW
-EXECUTE FUNCTION f_check_responsabile_scientifico();
+EXECUTE FUNCTION check_responsabile_scientifico();
 
 --________________________________________________________________________________________________________________________________--
 /*
@@ -628,21 +608,15 @@ $$
 		num_ore_tot := (select sum(ore_giornaliere) from afferenza as a where a.matricola = new.matricola);
 
 		IF (num_ore_tot > 8) THEN
-			RAISE EXCEPTION 'UN IMPIEGATO NON PUO LAVORARE PIU DI OTTO ORE AL GIORNO!';
+			RAISE EXCEPTION 'UN IMPIEGATO NON PUO LAVORARE PER PIU DI OTTO ORE AL GIORNO!';
 		END IF;
 
 	END;
 
 $$ LANGUAGE plpgsql;
 
-
 CREATE OR REPLACE TRIGGER check_afferenza
-AFTER INSERT ON AFFERENZA
-FOR EACH ROW
-EXECUTE FUNCTION f_check_afferenza();
-
-CREATE OR REPLACE TRIGGER check_afferenza
-AFTER UPDATE OF ore_giornaliere ON AFFERENZA
+AFTER INSERT OR UPDATE OF ore_giornaliere ON AFFERENZA
 FOR EACH ROW
 EXECUTE FUNCTION f_check_afferenza();
 --________________________________________________________________________________________________________________________________--
