@@ -1,4 +1,4 @@
-/*
+d/*
 	Questa parte è inerente al DDL : Data Definition Language 
 	L’azienda possiede un certo numero di impiegati, raggruppabili in 4 categorie:
 	1- Dipendente junior: colui che lavora da meno di 3 anni all’interno dell’azienda;
@@ -89,14 +89,12 @@ CREATE TABLE IF NOT EXISTS PROGETTO
 	responsabile DOMINIO_MATRICOLA NOT NULL, 
 	referente DOMINIO_MATRICOLA NOT NULL,  
 	
-	CONSTRAINT data_fine_corrente CHECK(data_fine>data_inizio),
-	CONSTRAINT budget_corretto CHECK(budget > 0),
 	CONSTRAINT cup_pk PRIMARY KEY(cup),
-
+	CONSTRAINT budget_corretto CHECK(budget > 0),
 	CONSTRAINT data_corretta CHECK(data_fine > data_inizio),
-	constraint pk_respnsabilità FOREIGN KEY(responsabile) REFERENCES IMPIEGATO(matricola)
+	constraint fk_responsabilità FOREIGN KEY(responsabile) REFERENCES IMPIEGATO(matricola)
 		ON UPDATE CASCADE,
-	constraint pk_referente FOREIGN KEY(referente) REFERENCES IMPIEGATO(matricola)
+	constraint fk_referente FOREIGN KEY(referente) REFERENCES IMPIEGATO(matricola)
 		ON UPDATE CASCADE
 );
 
@@ -127,9 +125,9 @@ CREATE TABLE IF NOT EXISTS AFFERENZA
 	id_lab VARCHAR NOT NULL,
 
 	CONSTRAINT matricola_afferenza_pk PRIMARY KEY(matricola,id_lab),
-	CONSTRAINT impiegato_afferenza_fk FOREIGN KEY(matricola) REFERENCES IMPIEGATO(matricola)
+	CONSTRAINT impiegato_fk FOREIGN KEY(matricola) REFERENCES IMPIEGATO(matricola)
 		ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT afferenza_laboratorio_fk FOREIGN KEY(id_lab) REFERENCES LABORATORIO(id_lab)
+	CONSTRAINT laboratorio_fk FOREIGN KEY(id_lab) REFERENCES LABORATORIO(id_lab)
 		ON UPDATE CASCADE ON DELETE CASCADE
 
 	/*
@@ -145,9 +143,9 @@ CREATE TABLE IF NOT EXISTS GESTIONE
 	id_lab   VARCHAR NOT NULL,
 
 	CONSTRAINT cup_id_pk PRIMARY KEY(cup, id_lab),
-	CONSTRAINT gestione_progetto_pk FOREIGN KEY(cup) REFERENCES PROGETTO(cup)
+	CONSTRAINT gestione_progetto_fk FOREIGN KEY(cup) REFERENCES PROGETTO(cup)
 		ON UPDATE CASCADE ON DELETE CASCADE ,
-	CONSTRAINT gestione_laboratorio_pk FOREIGN KEY(id_lab) REFERENCES LABORATORIO(id_lab)
+	CONSTRAINT gestione_laboratorio_fk FOREIGN KEY(id_lab) REFERENCES LABORATORIO(id_lab)
 		ON UPDATE CASCADE ON DELETE CASCADE
 
   /*

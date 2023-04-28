@@ -551,7 +551,7 @@
 											"top": 243,
 											"width": 121.5068359375,
 											"height": 13,
-											"text": "+StartDate: date",
+											"text": "+Data Inizio: date",
 											"horizontalAlignment": 0
 										},
 										{
@@ -568,7 +568,7 @@
 											"top": 258,
 											"width": 121.5068359375,
 											"height": 13,
-											"text": "+DeadLine: date",
+											"text": "+Data Fine: date",
 											"horizontalAlignment": 0
 										}
 									],
@@ -3279,7 +3279,7 @@
 							"_parent": {
 								"$ref": "AAAAAAGG/5WdCPfSDJE="
 							},
-							"name": "StartDate",
+							"name": "Data Inizio",
 							"type": "date"
 						},
 						{
@@ -3288,7 +3288,7 @@
 							"_parent": {
 								"$ref": "AAAAAAGG/5WdCPfSDJE="
 							},
-							"name": "DeadLine",
+							"name": "Data Fine",
 							"type": "date"
 						}
 					]
