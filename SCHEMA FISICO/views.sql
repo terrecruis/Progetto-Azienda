@@ -47,7 +47,6 @@ CREATE OR REPLACE VIEW STORICO_VIEW AS
         s2.data_scatto AS data_scatto_middle,
         s3.data_scatto AS data_scatto_senior,
     FROM IMPIEGATO i
-    --uguale matricola ma con storici diversi e scatti diversi.
     LEFT JOIN STORICO s1 ON i.matricola = s1.matricola AND s1.nuovo_ruolo = 'junior'
     LEFT JOIN STORICO s2 ON i.matricola = s2.matricola AND s2.nuovo_ruolo = 'middle'
     LEFT JOIN STORICO s3 ON i.matricola = s3.matricola AND s3.nuovo_ruolo = 'senior'
@@ -98,6 +97,7 @@ CREATE OR REPLACE VIEW Gestione_Attuale AS
     VIEW DEI RESPONSABILI SCIENTIFICI E I LORO LABORATORI ASSOCIATI
 */
 
+--da inserire e commentare
 CREATE OR REPLACE VIEW RESPONSABILI_SCIENTIFICI_ATTUALI AS
 (
     SELECT l.id_lab, l.r_scientifico
@@ -109,6 +109,7 @@ CREATE OR REPLACE VIEW RESPONSABILI_SCIENTIFICI_ATTUALI AS
     VIEW DEI REFERENTI E I LORO PROGETTI ATTUALI
 */
 
+--da aggiustare, inserire e commentare.
 CREATE OR REPLACE VIEW REFERENTI_ATTUALI AS
 (
     SELECT cup ,referente
@@ -154,3 +155,16 @@ CREATE OR REPLACE VIEW STORICO_DIRIGENTI AS
     WHERE nuovo_ruolo='dirigente'
     ORDER BY matricola,data_scatto
 );
+
+
+
+/*
+    0. LEGGI LA DOCUMENTAZIONE
+
+    1. mettere tutti i dizionari dopo la ristrutturazione
+    2. aggiungere gli attributi mancanti tipo_impiegato e dirigente e la loro descrizione
+
+    3. fare il dizionario dei vincoli
+
+    4. inizia coi trigger.
+*/

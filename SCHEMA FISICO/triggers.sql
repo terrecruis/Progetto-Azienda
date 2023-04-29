@@ -5,10 +5,6 @@
 
 
 
-
-
-
-
 --DA FARE
 /*
 	1.
@@ -21,8 +17,6 @@
 
 		NON MI FA INSERIRE QUESTO VECCHIO IMPIEGATO PERCHE LA DATA NON CORRISPONDE AL TIPO IMPIEGATO (AGGIORNA TRIGGER)
 	
-	3.
-		bloccare la modifica dell attributo (dirigente) quando l impiegato è stato licenziato
 */
 
 
@@ -685,4 +679,3 @@ EXECUTE FUNCTION f_cancella_afferenti();
 
 
 
---AGGIUSTARE IL PROBLEMA DEL DIRIGENTE CHE LO PUO DIVENTARE SOLO UNA VOLTA.
