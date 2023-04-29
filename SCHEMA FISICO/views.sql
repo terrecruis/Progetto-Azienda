@@ -46,7 +46,6 @@ CREATE OR REPLACE VIEW STORICO_VIEW AS
         s1.data_scatto AS data_scatto_junior,
         s2.data_scatto AS data_scatto_middle,
         s3.data_scatto AS data_scatto_senior,
-        i.dirigente
     FROM IMPIEGATO i
     --uguale matricola ma con storici diversi e scatti diversi.
     LEFT JOIN STORICO s1 ON i.matricola = s1.matricola AND s1.nuovo_ruolo = 'junior'

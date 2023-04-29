@@ -3,7 +3,7 @@
 */
 
 --INSERIMENTO NELLA TABELLA IMPIEGATO
-INSERT INTO IMPIEGATO (matricola, nome, cognome, cf, curriculum, stipendio, sesso, tipo_impiegato, dirigente, data_assunzione)
+INSERT INTO IMPIEGATO (matricola, nome, cognome, codice_fiscale, curriculum, stipendio, sesso, tipo_impiegato, dirigente, data_assunzione)
 VALUES
 ('MAT-001', 'Mario', 'Rossi', 'RSSMRA01A01F205F', 'Laurea in Informatica', 37000.00, 'M', 'senior', true, '2000-01-01'),
 ('MAT-002', 'Laura', 'Bianchi', 'BNCLRA02B02H501A', 'Laurea in Economia', 39000.00, 'F', 'senior', true, '2009-06-01'),
