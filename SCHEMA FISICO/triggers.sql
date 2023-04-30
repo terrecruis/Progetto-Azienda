@@ -322,44 +322,40 @@ EXECUTE FUNCTION f_avviso_su_impiegati_licenziati();
 
 CREATE OR REPLACE FUNCTION f_insert_storico() RETURNS TRIGGER AS
 $$
-    BEGIN
-        --controllo che la data assunzione sia consistente rispetto al tipo di impiegato
-        IF (NEW.tipo_impiegato = 'junior') THEN
-            IF((NEW.data_assunzione + INTERVAL '3 years') >= CURRENT_DATE ) THEN
-                INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
-            ELSE
-                RAISE EXCEPTION 'DATA DI ASSUNZIONE NON VALIDA PER UN DIPENDENTE JUNIOR';
-            END IF;
-
-        ELSIF (NEW.tipo_impiegato = 'middle') THEN
-            IF ((NEW.data_assunzione + INTERVAL '3 years') <= CURRENT_DATE AND
-                NEW.data_assunzione + INTERVAL '7 years' >= CURRENT_DATE ) THEN
-                    INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
-                    INSERT INTO storico VALUES ('junior', 'middle', NEW.data_assunzione + INTERVAL '3 years', NEW.matricola);
-            ELSE
-                RAISE EXCEPTION 'DATA DI ASSUNZIONE NON VALIDA PER UN DIPENDENTE MIDDLE';
-            END IF;
-
-        ELSIF (NEW.tipo_impiegato = 'senior') THEN
-            IF((NEW.data_assunzione + INTERVAL '7 years') <= CURRENT_DATE ) THEN
-                INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
-                INSERT INTO storico VALUES ('junior', 'middle', NEW.data_assunzione + INTERVAL '3 years', NEW.matricola);
-                INSERT INTO storico VALUES ('middle', 'senior', NEW.data_assunzione + INTERVAL '7 years', NEW.matricola);
-            ELSE
-                -- Error message
-                RAISE EXCEPTION 'DATA DI ASSUNZIONE NON VALIDA PER UN DIPENDENTE SENIOR';
-            END IF;
-
-
-		--caso in cui l'impiegato è inserito come dirigente[...]
-		IF(new.dirigente is true) THEN
-			INSERT INTO STORICO VALUES('NonDirigente','dirigente', CURRENT_DATE, new.matricola);
+BEGIN
+	--controllo che la data assunzione sia consistente rispetto al tipo di impiegato
+	IF (NEW.tipo_impiegato = 'junior') THEN
+		IF((NEW.data_assunzione + INTERVAL '3 years') >= CURRENT_DATE ) THEN
+			INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
+		ELSE
+			RAISE EXCEPTION 'DATA DI ASSUNZIONE NON VALIDA PER UN DIPENDENTE JUNIOR';
 		END IF;
 
+	ELSIF (NEW.tipo_impiegato = 'middle') THEN
+		IF ((NEW.data_assunzione + INTERVAL '3 years') <= CURRENT_DATE AND
+			NEW.data_assunzione + INTERVAL '7 years' >= CURRENT_DATE ) THEN
+				INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
+				INSERT INTO storico VALUES ('junior', 'middle', NEW.data_assunzione + INTERVAL '3 years', NEW.matricola);
+		ELSE
+			RAISE EXCEPTION 'DATA DI ASSUNZIONE NON VALIDA PER UN DIPENDENTE MIDDLE';
+		END IF;
 
-        END IF;
-        RETURN NEW;
-    END;
+	ELSIF (NEW.tipo_impiegato = 'senior') THEN
+		IF((NEW.data_assunzione + INTERVAL '7 years') <= CURRENT_DATE ) THEN
+			INSERT INTO storico VALUES (NULL, 'junior', NEW.data_assunzione, NEW.matricola);
+			INSERT INTO storico VALUES ('junior', 'middle', NEW.data_assunzione + INTERVAL '3 years', NEW.matricola);
+			INSERT INTO storico VALUES ('middle', 'senior', NEW.data_assunzione + INTERVAL '7 years', NEW.matricola);
+		ELSE
+			-- Error message
+			RAISE EXCEPTION 'DATA DI ASSUNZIONE NON VALIDA PER UN DIPENDENTE SENIOR';
+		END IF;	
+	END IF;
+	
+	IF(new.dirigente is true) THEN
+			INSERT INTO STORICO VALUES('NonDirigente','dirigente', CURRENT_DATE, new.matricola);
+		END IF;
+	RETURN NEW;
+END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER insert_storico
@@ -639,7 +635,7 @@ EXECUTE FUNCTION f_check_afferenza();
 	ogni volta che aggiungo o elimino un'afferenza impiegato-laboratorio allora aggiorno il numero di afferenti di quel
 	laboratorio.
 */
-create or replace function f_aggiorna_afferenti() returns trigger
+create or replace function f_inserisci_afferenti() returns trigger
 as
 $$
 	BEGIN
@@ -665,7 +661,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE TRIGGER inserisci_afferenti
 AFTER INSERT ON AFFERENZA
 FOR EACH ROW
-EXECUTE FUNCTION f_aggiorna_afferenti();
+EXECUTE FUNCTION f_inserisci_afferenti();
 
 CREATE OR REPLACE TRIGGER cancella_afferenti
 AFTER DELETE ON AFFERENZA
