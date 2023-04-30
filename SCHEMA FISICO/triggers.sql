@@ -20,10 +20,8 @@
 */
 
 
-
-
-/*
-	SCHEMA LOGICO:
+/*SCHEMA LOGICO:
+	
 
 	IMPIEGATO(matricola, nome, cognome, cf, curriculum, stipendio, sesso, foto, tipo, dirigente, data_licenziamento,data_assunzione)
 	LABORATORIO(id_lab, topic, indirizzo, numero_telefono, numero_afferenti, r_scientifico)
@@ -32,73 +30,74 @@
 	AFFERENZA(matricola, id_lab, ore_giornaliere)
 	GESTIONE(cup, id_lab)
 */
+--______________________________________________________________________________________________________________________________--
+/*PROCEDURE:
+	
 
-/*______________________________________________________________________________________________________________________________
-	PROCEDURE:
-
-OK	NUMERO 0
-		Creare una funzione di aggiornamento database che quando chiamata, mi aggiunge, se si verificano le condizioni,
-		i nuovi scatti di carriera fatti dagli impiegati e il loro attributo 'tipo_impiegato'
-		aggiorna_database(); (quando la data è inserita nel momento di creazione della tupla)
-OK	NUMERO 1
-		CONTROLLO SU IMPIEGATI LICENZIATI:		
-	  	SE SI SUPERA LA DATA_LICENZIAMENTO DI UN IMPIEGATO (REFERENTI,RESPONSABILI O R_SCIENTIFICI),RISULTERA' CHE LAVORA ANCORA IN QUEL LABORATORIO
-	  	O PROGETTO;	
-	 	LA PROCEDURA SI OCCUPA DI INVIARE UN MESSAGGIO DI WARNING NEL CASO SIANO PRESENTI QUESTI TIPI DI IMPIEGATO E 
-	  	SUGGERISCE IN QUALE LABORATORIO/PROGETTO CAMBIARE L'IMPIEGATO LICENZIATO.
+	OK	NUMERO 0
+			Creare una funzione di aggiornamento database che quando chiamata, mi aggiunge, se si verificano le condizioni,
+			i nuovi scatti di carriera fatti dagli impiegati e il loro attributo 'tipo_impiegato'
+			aggiorna_database(); (quando la data è inserita nel momento di creazione della tupla)
+	OK	NUMERO 1
+			CONTROLLO SU IMPIEGATI LICENZIATI:		
+			SE SI SUPERA LA DATA_LICENZIAMENTO DI UN IMPIEGATO (REFERENTI,RESPONSABILI O R_SCIENTIFICI),RISULTERA' CHE LAVORA ANCORA IN QUEL LABORATORIO
+			O PROGETTO;	
+			LA PROCEDURA SI OCCUPA DI INVIARE UN MESSAGGIO DI WARNING NEL CASO SIANO PRESENTI QUESTI TIPI DI IMPIEGATO E 
+			SUGGERISCE IN QUALE LABORATORIO/PROGETTO CAMBIARE L'IMPIEGATO LICENZIATO.
 */
 
-/*______________________________________________________________________________________________________________________________
-    TRIGGER SU IMPIEGATO:
+--______________________________________________________________________________________________________________________________--
+/*TRIGGER SU IMPIEGATO:
+		
 
-	(parte sullo storico e aggiornamento del database)
+		(parte sullo storico e aggiornamento del database)
 
-OK	0.1 Ogni volta che aggiungo un impiegato va aggioranta la tabella Storico, inserendo all'interno l'impiegato con
-		ruolo_prec = NULL e nuovo_ruolo = new.tipo, nel caso in cui il tipo inserito sia >junior allora, inserisco
-        all'interno dello storico il resto degli scatti di carriera rimanenti.
+	OK	0.1 Ogni volta che aggiungo un impiegato va aggioranta la tabella Storico, inserendo all'interno l'impiegato con
+			ruolo_prec = NULL e nuovo_ruolo = new.tipo, nel caso in cui il tipo inserito sia >junior allora, inserisco
+			all'interno dello storico il resto degli scatti di carriera rimanenti.
 
-OK	0.2 potremmo fare qualche vincolo di integrita semantica
-		(esempio un junior non puo avere lo stipendio piu alto di un senior)
+	OK	0.2 potremmo fare qualche vincolo di integrita semantica
+			(esempio un junior non puo avere lo stipendio piu alto di un senior)
 
-OK	0.3 (delete)Nel momento in cui elimino un dirigente che è associato ad un progetto allora devo chiedere all'utente di sostituire
-		il responsabile di quel progetto altrimenti lanciando un messaggio di errore.
-		stessa cosa per referente per un progetto e un responsabile scientifico per quel progetto.
-		Questo giustificato dal fatto che un progetto non può esserci senza responsabile e referente,
-		e un laboratorio non può esserci senza un referente scientifico.
+	OK	0.3 (delete)Nel momento in cui elimino un dirigente che è associato ad un progetto allora devo chiedere all'utente di sostituire
+			il responsabile di quel progetto altrimenti lanciando un messaggio di errore.
+			stessa cosa per referente per un progetto e un responsabile scientifico per quel progetto.
+			Questo giustificato dal fatto che un progetto non può esserci senza responsabile e referente,
+			e un laboratorio non può esserci senza un referente scientifico.
 
- OK   0.4(update false->true)nel caso in cui viene aggiornato l'attributo booleano dirigente in Impiegato, allora
-        bisogna inserire la data scatto all'interno dello storico.
-        (update true->false)nel caso in cui il dirigente gestisce qualche progetto mandare messaggio di errore, altrimenti,
-        fare inserimento all'interno dello storico della data_scatto 'nonDirigente'->'dirigente'.
+	OK   0.4(update false->true)nel caso in cui viene aggiornato l'attributo booleano dirigente in Impiegato, allora
+			bisogna inserire la data scatto all'interno dello storico.
+			(update true->false)nel caso in cui il dirigente gestisce qualche progetto mandare messaggio di errore, altrimenti,
+			fare inserimento all'interno dello storico della data_scatto 'nonDirigente'->'dirigente'.
 
-    _________________________________________________________________________________________________________________________________
-    	TRIGGER SUL PROGETTO:
+_________________________________________________________________________________________________________________________________
+TRIGGER SUL PROGETTO:
 
-OK	1.0 (insert prog) quando aggiungo un referente e un responsabile devo fare in modo tale
-		che sia il primo senior e il secondo dirigente,
-		altrimenti mando un messaggio di errore e non faccio l'inserimento.
+	OK	1.0 (insert prog) quando aggiungo un referente e un responsabile devo fare in modo tale
+			che sia il primo senior e il secondo dirigente,
+			altrimenti mando un messaggio di errore e non faccio l'inserimento.
 
-OK	1.1(update referente, matricola) se si aggiorna un responsabile o un referente allora si verifichi che il nuovo
-		valore sia assegnabile.
+	OK	1.1(update referente, matricola) se si aggiorna un responsabile o un referente allora si verifichi che il nuovo
+			valore sia assegnabile.
 
-ok	1.2(vincolo di gestione) Un progetto ATTIVI (data fine = null) ha al più
-		tre laboratori associati. (sulla tabella gestione).
+	ok	1.2(vincolo di gestione) Un progetto ATTIVI (data fine = null) ha al più
+			tre laboratori associati. (sulla tabella gestione).
 
-	_________________________________________________________________________________________________________________
+_________________________________________________________________________________________________________________
+TRIGGER SU LABORATORIO:
 
-	TRIGGER SU LABORATORIO:
-OK	2.0 verifica che un responsabile scientifico sia unico e senior per ogni laboratorio diverso.
+	OK	2.0 verifica che un responsabile scientifico sia unico e senior per ogni laboratorio diverso.
 
-OK	2.05 quando aggiorno un responsabile scientifico, controllo se il nuovo valore è un senior, altrimenti rollback
+	OK	2.05 quando aggiorno un responsabile scientifico, controllo se il nuovo valore è un senior, altrimenti rollback
 
-OK	2.1 quando aggiungo un responsabile scientifico esso dev'essere un senior, altrimenti elimina la tupla
-		lanciando un messaggio di eccezione.
+	OK	2.1 quando aggiungo un responsabile scientifico esso dev'essere un senior, altrimenti elimina la tupla
+			lanciando un messaggio di eccezione.
 
-OK	2.2 controllare che un impiegato non lavora per più di otto ore al giorno (tabella afferenza), altrimenti
-		lanciare un messaggio di errore.
+	OK	2.2 controllare che un impiegato non lavora per più di otto ore al giorno (tabella afferenza), altrimenti
+			lanciare un messaggio di errore.
 
-OK	2.3 ogni volta che aggiungo o elimino un'afferenza impiegato-laboratorio allora aggiorno il numero di afferenti di quel
-		laboratorio.
+	OK	2.3 ogni volta che aggiungo o elimino un'afferenza impiegato-laboratorio allora aggiorno il numero di afferenti di quel
+			laboratorio.
 
 */
 
