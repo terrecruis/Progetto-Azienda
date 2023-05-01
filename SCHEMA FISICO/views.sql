@@ -17,6 +17,14 @@
 
 --_____________________________________________________________________________________________--
 
+CREATE OR REPLACE VIEW Progetti_attuali AS
+(
+    SELECT *
+    FROM progetto
+    WHERE data_fine > CURRENT_DATE OR data_fine is NULL
+);
+--_____________________________________________________________________________________________--
+
 CREATE OR REPLACE VIEW Impiegati_attuali AS
 select*
 from Impiegato
@@ -29,7 +37,7 @@ CREATE OR REPLACE VIEW Storico_view AS
     SELECT i.nome, i.cognome, i.matricola,
         s1.data_scatto AS data_scatto_junior,
         s2.data_scatto AS data_scatto_middle,
-        s3.data_scatto AS data_scatto_senior,
+        s3.data_scatto AS data_scatto_senior
     FROM impiegato i
     LEFT JOIN STORICO s1 ON i.matricola = s1.matricola AND s1.nuovo_ruolo = 'junior'
     LEFT JOIN STORICO s2 ON i.matricola = s2.matricola AND s2.nuovo_ruolo = 'middle'
@@ -43,6 +51,15 @@ CREATE OR REPLACE VIEW Dirigenti_Attuali AS
     select *
     from Impiegati_attuali
     where dirigente is true 
+);
+
+--_____________________________________________________________________________________________--
+
+CREATE OR REPLACE VIEW Referenti_attuali AS
+(
+    SELECT *
+    FROM Impiegati_attuali as i
+    WHERE i.matricola IN (SELECT referente FROM Progetti_attuali)
 );
 
 --_____________________________________________________________________________________________--
@@ -64,29 +81,11 @@ CREATE OR REPLACE VIEW Responsabili_scientifici_attuali AS
 
 --_____________________________________________________________________________________________--
 
-CREATE OR REPLACE VIEW Referenti_attuali AS
-(
-    SELECT *
-    FROM Impiegati_attuali as i
-    WHERE i.matricola IN (SELECT referente FROM Progetti_attuali)
-);
-
---_____________________________________________________________________________________________--
-
 CREATE OR REPLACE VIEW Progetti_terminati AS
 (
     SELECT *
     FROM progetto
     WHERE data_fine <= CURRENT_DATE
-);
-
---_____________________________________________________________________________________________--
-
-CREATE OR REPLACE VIEW Progetti_attuali AS
-(
-    SELECT *
-    FROM progetto
-    WHERE data_fine > CURRENT_DATE OR data_fine is NULL
 );
 
 --_____________________________________________________________________________________________--
@@ -99,12 +98,3 @@ CREATE OR REPLACE VIEW Afferenza_attuale AS
 
 --_____________________________________________________________________________________________--
 
-/*DA CONFRONTARE CON LA FUNZIONE
-
-CREATE OR REPLACE VIEW Storico_dirigenti AS
-(
-    SELECT *
-    FROM storico 
-    WHERE nuovo_ruolo='dirigente'
-    ORDER BY matricola,data_scatto
-);
